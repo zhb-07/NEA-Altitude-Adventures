@@ -18,6 +18,10 @@ git push origin
 	- "origin" branch is your website branch, your main branch
 	- Once you push all updates are gone and you will have to do new commits and new status's for more push
 
+git pull origin
+	- Updates your code from the origin branch
+	- Always do this before git commit
+
 
 Always push updates so that you are always up to date
 
