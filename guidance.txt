@@ -1,0 +1,24 @@
+
+
+git status
+	- Gives status of files
+	- Red = not being tracked (meaning not added and wont be pushed to origin branch)
+	- Green = being tracked (meaning will get added to origin branch)
+
+	- When you add '.' you say track all of this
+	- If you add instead "main.py" then you are specifying that file
+
+git commit
+	- Commit message so that it can get pushed
+	- Can do multiple commits
+	- If add "-m" then followed by message in quotation marks it will be like message to see
+
+git push origin
+	- Pushes updates to branch
+	- "origin" branch is your website branch, your main branch
+	- Once you push all updates are gone and you will have to do new commits and new status's for more push
+
+
+Always push updates so that you are always up to date
+
+Watch youtube vids: https://youtu.be/X2Kc1ZCADig?si=OyS1yW-utffF3hE_
