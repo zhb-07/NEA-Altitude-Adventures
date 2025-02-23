@@ -1,9 +1,16 @@
+from symtable import Class
+
 import pygame
-import main
+import random
+import math
 
 player_image = pygame.image.load("player.png")
-player_image = pygame.transform.scale(player_image, (50, 50))
+player_image = pygame.transform.scale(player_image, (20, 20))
 player_image.set_colorkey((163,73,164))
+
+enemy_image = pygame.image.load("player.png")
+enemy_image = pygame.transform.scale(enemy_image, (50, 50))
+enemy_image.set_colorkey((105,106,106))
 
 class Player:
     def __init__(self, x, y):
@@ -28,7 +35,6 @@ class Player:
         self.grounded = False
 
     def apply_gravity(self, platforms):
-        """Applies gravity and checks for collisions with platforms."""
         self.y_velocity += self.gravity
         self.rect.y += self.y_velocity
         self.grounded = False
@@ -46,3 +52,58 @@ class Platform:
     def __init__(self, x, y, width, height):
         self.rect = pygame.Rect(x, y, width, height)
 
+class Enemy:
+    def __init__(self, x, y, health, speed):
+        self.image = enemy_image
+        self.x = x
+        self.y = y
+        self.health = health
+        self.speed = speed
+        self.rect = pygame.Rect(self.x, self.y, 50, 50)  # Enemy hitbox
+
+    @classmethod
+    def spawn_random(cls, player_x, player_y):
+        """Spawn enemy at a random position away from the player."""
+        spawn_distance = 300  # Minimum distance from player
+        screen_width, screen_height = 800, 600  # Adjust based on your game
+
+        # Randomly choose spawn side (left, right, top, bottom)
+        side = random.choice(["left", "right", "top", "bottom"])
+        if side == "left":
+            x = random.randint(0, screen_width // 2 - spawn_distance)
+            y = random.randint(0, screen_height)
+        elif side == "right":
+            x = random.randint(screen_width // 2 + spawn_distance, screen_width)
+            y = random.randint(0, screen_height)
+        elif side == "top":
+            x = random.randint(0, screen_width)
+            y = random.randint(0, screen_height // 2 - spawn_distance)
+        else:  # bottom
+            x = random.randint(0, screen_width)
+            y = random.randint(screen_height // 2 + spawn_distance, screen_height)
+
+        return cls(x, y, health=100, damage=10, speed=random.randint(2, 5))
+
+    def move_towards_player(self, player_x, player_y):
+        """Move enemy towards the player smoothly."""
+        dx = player_x - self.x
+        dy = player_y - self.y
+        distance = math.sqrt(dx**2 + dy**2)
+
+        if distance != 0:
+            self.x += (dx / distance) * self.speed
+            self.y += (dy / distance) * self.speed
+
+        # Update enemy hitbox position
+        self.rect.topleft = (self.x, self.y)
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect.topleft )
+
+class Tilemap:
+    def __init__(self,tsize = 16):
+        self.tsize = tsize
+        self.tilemap = {}
+        self.offgrid_tiles = []
+
+        {0,0}

@@ -8,7 +8,7 @@ pygame.mixer.init()
 pygame.mixer.music.load("Acoustic_Alititude_1.mp3")
 pygame.mixer.music.play(loops = -1)
 height = 800
-width = 1535
+width = 1530
 bg = (89, 120, 142)
 bg_image = pygame.image.load("bg_image.png")
 screen = pygame.display.set_mode((width, height))
@@ -99,6 +99,8 @@ def start():
                     click = True
         if key[pygame.K_k] == True:
             menu()
+        if key[pygame.K_l] == True:
+            lselect()
 
         pygame.display.update()
 
@@ -473,6 +475,7 @@ def game_opt():
 
 def lvl1():
     player = game.Player(100, 500)
+    enemy = game.Enemy(0,0,0,1)
     ground_level = 730
     platform1 = game.Platform(0, ground_level, 800, 10)  # Example platform
     platforms = [platform1]  # Add more platforms if needed
