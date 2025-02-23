@@ -1,13 +1,14 @@
 import pygame
 import pygame_gui
 import sqlite3
+import game
 
 pygame.init()
 pygame.mixer.init()
 pygame.mixer.music.load("Acoustic_Alititude_1.mp3")
 pygame.mixer.music.play(loops = -1)
 height = 805
-width = 1536
+width = 1535
 bg = (89, 120, 142)
 screen = pygame.display.set_mode((width, height))
 clock = pygame.time.Clock()
@@ -25,6 +26,7 @@ connection.commit()
 font1 = pygame.font.SysFont(None, 75)
 font2 = pygame.font.SysFont(None, 35)
 font3 = pygame.font.SysFont(None, 50)
+lvl = 1
 
 print("I LOVE ONIONS!!!!!!!!!!!")
 print("Hello World!")
@@ -319,10 +321,17 @@ def lselect():
                 lvl1()
         if button2.collidepoint((mx, my)):
             if click:
-                lvl2()
+                if lvl == 2:
+                    lvl2()
+                else:
+                    error_scr("Complete level 1")
+
         if button3.collidepoint((mx, my)):
             if click:
-                lvl3()
+                if lvl == 3:
+                    lvl3()
+                else:
+                    error_scr("Complete level 2")
         if button4.collidepoint((mx,my)):
             if click:
                 char_select()
@@ -381,10 +390,12 @@ def opt():
         if volume_increase.collidepoint((mx,my)):
             if click:
                 vol = vol + 0.1
+                click = False
 
         elif volume_decrease.collidepoint((mx,my)):
             if click:
                 vol = vol - 0.1
+                click = False
 
         pygame.display.update()
 
@@ -402,12 +413,26 @@ def opt():
                 if event.button == 1:
                     click = True
 
-            if event.type == pygame.MOUSEBUTTONUP:
-                if event.button == 1:
-                    click = False
 
 def lvl1():
-    return
+    player = game.Player(100, 500, 50, 50, (0, 255, 0))  # Spawn player near the ground
+    ground_level = 750  # Define ground level
+
+    running = True
+    while running:
+        screen.fill((bg))
+        keys = pygame.key.get_pressed()
+
+        player.move(keys)
+        player.apply_gravity(ground_level)
+        player.draw(screen)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+
+        pygame.display.update()
+        clock.tick(60)
 
 def lvl2():
     return
