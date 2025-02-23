@@ -475,23 +475,17 @@ def game_opt():
 
 def lvl1():
     player = game.Player(100, 500)
-    enemy = game.Enemy(0,0,0,1)
     ground_level = 730
-    platform1 = game.Platform(0, ground_level, 800, 10)  # Example platform
+    platform1 = game.Platform(0, ground_level, 1535, 10)  # Example platform
     platforms = [platform1]  # Add more platforms if needed
-
     running = True
     while running:
-
-        screen.fill((bg))
+        screen.fill(bg)
         game.draw_tilemap()
-
         keys = pygame.key.get_pressed()
-
         player.move(keys)
-        player.apply_gravity(platforms)  # Now passing the list of platforms
+        player.apply_gravity(platforms)
         player.draw(screen)
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
