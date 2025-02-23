@@ -2,89 +2,54 @@ import pygame
 
 # Initialize Pygame
 pygame.init()
-width, height = 800, 600
-screen = pygame.display.set_mode((width, height))
-clock = pygame.time.Clock()
 
-# Load player sprite
-player_image = pygame.image.load("player.png")
-player_image = pygame.transform.scale(player_image, (50, 50))
+# Screen settings
+SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
+TILE_SIZE = 50  # Size of each tile (square)
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-class Player:
-    def __init__(self, x, y):
-        self.image = player_image
-        self.rect = self.image.get_rect(topleft=(x, y))
-        self.velocity = 5
-        self.jump_power = -15
-        self.gravity = 1
-        self.y_velocity = 0
-        self.grounded = False
+# Load tile images
+grass_img = pygame.image.load("grass.png")
+wall_img = pygame.image.load("stone.png")
 
-    def move(self, keys):
-        if keys[pygame.K_LEFT]:
-            self.rect.x -= self.velocity
-        if keys[pygame.K_RIGHT]:
-            self.rect.x += self.velocity
-        if keys[pygame.K_SPACE] and self.grounded:
-            self.jump()
+# Scale images to fit tile size
+grass_img = pygame.transform.scale(grass_img, (TILE_SIZE, TILE_SIZE))
+wall_img = pygame.transform.scale(wall_img, (TILE_SIZE, TILE_SIZE))
 
-    def jump(self):
-        self.y_velocity = self.jump_power
-        self.grounded = False
+# Define the tilemap (0 = Grass, 1 = Wall)
+tilemap = [
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1],
+    [1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1],
+    [1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+]
 
-    def apply_gravity(self, platforms):
-        """Applies gravity and checks for collisions with platforms."""
-        self.y_velocity += self.gravity
-        self.rect.y += self.y_velocity
-        self.grounded = False
+# Function to draw the tilemap
+def draw_tilemap():
+    for row_index, row in enumerate(tilemap):
+        for col_index, tile in enumerate(row):
+            x = col_index * TILE_SIZE
+            y = row_index * TILE_SIZE
 
-        for platform in platforms:  # Ensure platforms is a list!
-            if self.rect.colliderect(platform.rect) and self.y_velocity > 0:
-                self.rect.bottom = platform.rect.top
-                self.y_velocity = 0
-                self.grounded = True
+            if tile == 0:
+                screen.blit(grass_img, (x, y))  # Draw grass
+            elif tile == 1:
+                screen.blit(wall_img, (x, y))  # Draw wall
 
-    def draw(self, screen):
-        screen.blit(self.image, self.rect.topleft)
+# Main loop
+running = True
+while running:
+    screen.fill((0, 0, 0))  # Clear the screen
 
-class Platform:
-    """Class to define platforms."""
-    def __init__(self, x, y, width, height):
-        self.rect = pygame.Rect(x, y, width, height)
+    draw_tilemap()  # Draw the tilemap
 
-    def draw(self, screen):
-        pygame.draw.rect(screen, (0, 0, 255), self.rect)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
 
-def lvl1():
-    player = Player(100, 500)  # Create player
+    pygame.display.update()
 
-    # Ensure platforms is a **list of Platform objects**
-    platforms = [
-        Platform(0, 550, 800, 50),  # Ground
-        Platform(200, 450, 100, 20),
-        Platform(400, 350, 150, 20),
-        Platform(600, 250, 100, 20)
-    ]
-
-    running = True
-    while running:
-        screen.fill((255, 255, 255))  # White background
-        keys = pygame.key.get_pressed()
-
-        player.move(keys)
-        player.apply_gravity(platforms)  # ✅ Pass the correct platforms list
-        player.draw(screen)
-
-        for platform in platforms:
-            platform.draw(screen)
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-        pygame.display.update()
-        clock.tick(60)
-
-    pygame.quit()
-
-lvl1()
+pygame.quit()

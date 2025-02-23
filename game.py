@@ -1,16 +1,38 @@
-from symtable import Class
-
 import pygame
 import random
 import math
+import main
 
 player_image = pygame.image.load("player.png")
 player_image = pygame.transform.scale(player_image, (20, 20))
 player_image.set_colorkey((163,73,164))
-
+grass_img = pygame.image.load("grass.png")
+wall_img = pygame.image.load("stone.png")
 enemy_image = pygame.image.load("player.png")
 enemy_image = pygame.transform.scale(enemy_image, (50, 50))
 enemy_image.set_colorkey((105,106,106))
+TILE_SIZE = 20
+
+tilemap = [
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1],
+    [1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1],
+    [1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+]
+
+def draw_tilemap():
+    for row_index, row in enumerate(tilemap):
+        for col_index, tile in enumerate(row):
+            x = col_index * TILE_SIZE
+            y = row_index * TILE_SIZE
+
+            if tile == 0:
+                main.screen.blit(grass_img, (x, y))  # Draw grass
+            elif tile == 1:
+                main.screen.blit(wall_img, (x, y))  # Draw wall
 
 class Player:
     def __init__(self, x, y):
@@ -100,10 +122,3 @@ class Enemy:
     def draw(self, screen):
         screen.blit(self.image, self.rect.topleft )
 
-class Tilemap:
-    def __init__(self,tsize = 16):
-        self.tsize = tsize
-        self.tilemap = {}
-        self.offgrid_tiles = []
-
-        {0,0}

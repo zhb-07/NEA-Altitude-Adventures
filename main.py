@@ -482,8 +482,9 @@ def lvl1():
 
     running = True
     while running:
-        screen.fill((bg))
 
+        screen.fill((bg))
+        game.draw_tilemap()
 
         keys = pygame.key.get_pressed()
 
