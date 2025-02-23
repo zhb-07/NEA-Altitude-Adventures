@@ -3,6 +3,9 @@ import pygame_gui
 import sqlite3
 
 pygame.init()
+pygame.mixer.init()
+pygame.mixer.music.load("Acoustic_Alititude_1.mp3")
+pygame.mixer.music.play(loops = -1)
 height = 805
 width = 1536
 bg = (89, 120, 142)
@@ -21,8 +24,10 @@ cursor.execute("""
 connection.commit()
 font1 = pygame.font.SysFont(None, 75)
 font2 = pygame.font.SysFont(None, 35)
+font3 = pygame.font.SysFont(None, 50)
 
 print("I LOVE ONIONS!!!!!!!!!!!")
+print("Hello World!")
 
 def write(text, font, colour, surface, x, y):
     obj = font.render(text, True, colour)
@@ -55,7 +60,7 @@ def start():
     click = False
     while True:
         screen.fill(bg)
-
+        key = pygame.key.get_pressed()
         pygame.display.set_caption("Altitude Adventures")
         write("Altitude Adventures", font1, (255, 255, 255), screen, 501, 100)
 
@@ -87,6 +92,8 @@ def start():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
+        if key[pygame.K_k] == True:
+            menu()
 
         pygame.display.update()
 
@@ -233,7 +240,18 @@ def login():
         pygame.display.update()
 
 def forgot_password():
-    pass
+    for element in manager.get_root_container().elements[:]:
+        element.kill()
+    email_entry = pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((115, 200), (1350, 75)),
+                                                      manager=manager)
+    username_entry = pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((115, 300), (1350, 75)),
+                                                         manager=manager)
+    passw_entry = pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((115, 400), (1350, 75)),
+                                                      manager=manager)
+    running = True
+
+    while running:
+        screen.fill(bg)
 
 def menu():
     click = False
@@ -267,7 +285,7 @@ def menu():
         pygame.draw.rect(screen, (33, 40, 45), button4)
         click = False
         write("Play", font1, (255, 255, 255), screen, 615, 300)
-        write("Leaderboard", font1, (255, 255, 255), screen, 615, 430)
+        write("Leaderboard", font3, (255, 255, 255), screen, 615, 430)
         write("Options", font1, (255, 255, 255), screen, 615, 560)
         write("Quit", font1, (255, 255, 255), screen, 615, 690)
         for event in pygame.event.get():
@@ -281,7 +299,56 @@ def menu():
         pygame.display.update()
 
 def lselect():
-    return
+    click = False
+    running = True
+    while running:
+        screen.fill(bg)
+
+        pygame.display.set_caption("Altitude Adventures")
+        write("Level Select", font1, (255, 255, 255), screen, 630, 100)
+
+        mx, my = pygame.mouse.get_pos()
+
+        button1 = pygame.Rect(615, 290, 300, 75)
+        button2 = pygame.Rect(615, 390, 300, 75)
+        button3 = pygame.Rect(615, 490, 300, 75)
+        button4 = pygame.Rect(615, 590, 300, 75)
+        button5 = pygame.Rect(615, 690, 300, 75)
+        if button1.collidepoint((mx, my)):
+            if click:
+                lvl1()
+        if button2.collidepoint((mx, my)):
+            if click:
+                lvl2()
+        if button3.collidepoint((mx, my)):
+            if click:
+                lvl3()
+        if button4.collidepoint((mx,my)):
+            if click:
+                char_select()
+        if button5.collidepoint((mx, my)):
+            if click:
+                running = False
+        pygame.draw.rect(screen, (33, 40, 45), button1)
+        pygame.draw.rect(screen, (33, 40, 45), button2)
+        pygame.draw.rect(screen, (33, 40, 45), button3)
+        pygame.draw.rect(screen,(33,40,45),button4)
+        pygame.draw.rect(screen, (33, 40, 45), button5)
+        click = False
+        write("Level One", font1, (255, 255, 255), screen, 615, 300)
+        write("Level Two", font1, (255, 255, 255), screen, 615, 400)
+        write("Level Three", font1, (255, 255, 255), screen, 615, 500)
+        write ("Character Select",font3,(255,255,255),screen,615,600)
+        write("Back", font1, (255, 255, 255), screen, 615, 700)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+
+        pygame.display.update()
 
 def leaderboard():
     return
@@ -289,11 +356,35 @@ def leaderboard():
 def opt():
     click = False
     running = True
+    vol = 1.0
 
     while running:
+        pygame.mixer.music.set_volume(vol)
+        mx, my = pygame.mouse.get_pos()
+
         screen.fill(bg)
         pygame.display.set_caption("Altitude Adventures")
-        write("Options",font1,(255,255,255),screen,500,100)
+        write("Options",font1,(255,255,255),screen,680,100)
+
+        volume = pygame.Rect(100, 150, 410, 75)
+        pygame.draw.rect(screen, (33, 40, 45), volume)
+        write("Volume", font2, (255, 255, 255), screen, 310, 170)
+
+        volume_decrease = pygame.Rect(100, 150, 75, 75)
+        pygame.draw.rect(screen, (33, 40, 45), volume_decrease)
+        write("-", font2, (255, 255, 255), screen, 130, 170)
+
+        volume_increase = pygame.Rect(500, 150, 75, 75)
+        pygame.draw.rect(screen, (33, 40, 45), volume_increase)
+        write("+", font2, (255, 255, 255), screen, 530, 170)
+
+        if volume_increase.collidepoint((mx,my)):
+            if click:
+                vol = vol + 0.1
+
+        elif volume_decrease.collidepoint((mx,my)):
+            if click:
+                vol = vol - 0.1
 
         pygame.display.update()
 
@@ -301,5 +392,30 @@ def opt():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return
+            manager.process_events(event)
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+
+            if event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:
+                    click = False
+
+def lvl1():
+    return
+
+def lvl2():
+    return
+
+def lvl3():
+    return
+
+def char_select():
+    return
 
 start()
