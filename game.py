@@ -15,7 +15,7 @@ class Player:
             self.rect.x -= self.velocity
         if keys[pygame.K_d]:
             self.rect.x += self.velocity
-        if keys[pygame.K_SPACE] and self.grounded:
+        if keys[pygame.K_SPACE] and self.grounded or keys[pygame.K_w] and self.grounded:
             self.jump()
 
     def jump(self):
