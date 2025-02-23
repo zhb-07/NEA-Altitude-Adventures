@@ -7,9 +7,10 @@ pygame.init()
 pygame.mixer.init()
 pygame.mixer.music.load("Acoustic_Alititude_1.mp3")
 pygame.mixer.music.play(loops = -1)
-height = 805
+height = 800
 width = 1535
 bg = (89, 120, 142)
+bg_image = pygame.image.load("bg_image.png")
 screen = pygame.display.set_mode((width, height))
 clock = pygame.time.Clock()
 manager = pygame_gui.UIManager((width, height))
@@ -44,6 +45,7 @@ def error_scr(message):
 
     while run:
         screen.fill((89, 120, 142, 128))
+        screen.blit(bg_image, (0, 0))
         popup = pygame.Rect(513, 327, 496, 150)
         pygame.draw.rect(screen, (200, 50, 50), popup, border_radius=10)
         write(message, font2, (255, 255, 255), screen, 520, 340)
@@ -62,6 +64,7 @@ def start():
     click = False
     while True:
         screen.fill(bg)
+        screen.blit(bg_image, (0, 0))
         key = pygame.key.get_pressed()
         pygame.display.set_caption("Altitude Adventures")
         write("Altitude Adventures", font1, (255, 255, 255), screen, 501, 100)
@@ -110,6 +113,7 @@ def register():
 
     while running:
         screen.fill(bg)
+        screen.blit(bg_image, (0, 0))
         manager.draw_ui(screen)
 
         write("Register", font1, (255, 255, 255), screen, 701, 100)
@@ -182,6 +186,7 @@ def login():
 
     while running:
         screen.fill(bg)
+        screen.blit(bg_image, (0, 0))
         manager.draw_ui(screen)
 
         write("Login", font1, (255, 255, 255), screen, 701, 100)
@@ -253,13 +258,14 @@ def forgot_password():
     running = True
 
     while running:
+        screen.blit(bg_image, (0, 0))
         screen.fill(bg)
 
 def menu():
     click = False
     while True:
         screen.fill(bg)
-
+        screen.blit(bg_image, (0, 0))
         pygame.display.set_caption("Altitude Adventures")
         write("Main Menu", font1, (255, 255, 255), screen, 630, 100)
 
@@ -305,7 +311,7 @@ def lselect():
     running = True
     while running:
         screen.fill(bg)
-
+        screen.blit(bg_image, (0, 0))
         pygame.display.set_caption("Altitude Adventures")
         write("Level Select", font1, (255, 255, 255), screen, 630, 100)
 
@@ -370,8 +376,8 @@ def opt():
     while running:
         pygame.mixer.music.set_volume(vol)
         mx, my = pygame.mouse.get_pos()
-
         screen.fill(bg)
+        screen.blit(bg_image, (0, 0))
         pygame.display.set_caption("Altitude Adventures")
         write("Options",font1,(255,255,255),screen,680,100)
 
@@ -413,23 +419,82 @@ def opt():
                 if event.button == 1:
                     click = True
 
+def game_opt():
+    click = False
+    running = True
+    vol = 1.0
+
+    while running:
+        pygame.mixer.music.set_volume(vol)
+        mx, my = pygame.mouse.get_pos()
+
+        screen.fill(bg)
+        screen.blit(bg_image, (0, 0))
+        pygame.display.set_caption("Altitude Adventures")
+        write("Options",font1,(255,255,255),screen,680,100)
+
+        volume = pygame.Rect(100, 150, 410, 75)
+        pygame.draw.rect(screen, (33, 40, 45), volume)
+        write("Volume", font2, (255, 255, 255), screen, 310, 170)
+
+        volume_decrease = pygame.Rect(100, 150, 75, 75)
+        pygame.draw.rect(screen, (33, 40, 45), volume_decrease)
+        write("-", font2, (255, 255, 255), screen, 130, 170)
+
+        volume_increase = pygame.Rect(500, 150, 75, 75)
+        pygame.draw.rect(screen, (33, 40, 45), volume_increase)
+        write("+", font2, (255, 255, 255), screen, 530, 170)
+
+        if volume_increase.collidepoint((mx,my)):
+            if click:
+                vol = vol + 0.1
+                click = False
+
+        elif volume_decrease.collidepoint((mx,my)):
+            if click:
+                vol = vol - 0.1
+                click = False
+
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return
+            manager.process_events(event)
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
 
 def lvl1():
-    player = game.Player(100, 500, 50, 50, (0, 255, 0))  # Spawn player near the ground
-    ground_level = 750  # Define ground level
+    player = game.Player(100, 500)
+    ground_level = 730
+    platform1 = game.Platform(0, ground_level, 800, 10)  # Example platform
+    platforms = [platform1]  # Add more platforms if needed
 
     running = True
     while running:
         screen.fill((bg))
+
+
         keys = pygame.key.get_pressed()
 
         player.move(keys)
-        player.apply_gravity(ground_level)
+        player.apply_gravity(platforms)  # Now passing the list of platforms
         player.draw(screen)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    game_opt()
 
         pygame.display.update()
         clock.tick(60)
