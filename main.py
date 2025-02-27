@@ -7,8 +7,8 @@ pygame.init()
 pygame.mixer.init()
 pygame.mixer.music.load("Acoustic_Alititude_1.mp3")
 pygame.mixer.music.play(loops = -1)
-height = 800
-width = 1530
+height = 805
+width = 1535
 bg = (89, 120, 142)
 bg_image = pygame.image.load("bg_image.png")
 screen = pygame.display.set_mode((width, height))
@@ -45,7 +45,6 @@ def error_scr(message):
 
     while run:
         screen.fill((89, 120, 142, 128))
-        screen.blit(bg_image, (0, 0))
         popup = pygame.Rect(513, 327, 496, 150)
         pygame.draw.rect(screen, (200, 50, 50), popup, border_radius=10)
         write(message, font2, (255, 255, 255), screen, 520, 340)
@@ -64,7 +63,6 @@ def start():
     click = False
     while True:
         screen.fill(bg)
-        screen.blit(bg_image, (0, 0))
         key = pygame.key.get_pressed()
         pygame.display.set_caption("Altitude Adventures")
         write("Altitude Adventures", font1, (255, 255, 255), screen, 501, 100)
@@ -115,7 +113,6 @@ def register():
 
     while running:
         screen.fill(bg)
-        screen.blit(bg_image, (0, 0))
         manager.draw_ui(screen)
 
         write("Register", font1, (255, 255, 255), screen, 701, 100)
@@ -188,7 +185,6 @@ def login():
 
     while running:
         screen.fill(bg)
-        screen.blit(bg_image, (0, 0))
         manager.draw_ui(screen)
 
         write("Login", font1, (255, 255, 255), screen, 701, 100)
@@ -242,7 +238,9 @@ def login():
         if button_back.collidepoint((mx, my)) and click:
             running = False
             return
-        if button_forgot.collidepoint((mx,my)):
+        if button_forgot.collidepoint((mx,my)) and click:
+            for element in manager.get_root_container().elements[:]:
+                element.kill()
             forgot_password()
 
         click = False
@@ -251,23 +249,88 @@ def login():
 def forgot_password():
     for element in manager.get_root_container().elements[:]:
         element.kill()
-    email_entry = pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((115, 200), (1350, 75)),
-                                                      manager=manager)
-    username_entry = pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((115, 300), (1350, 75)),
-                                                         manager=manager)
-    passw_entry = pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((115, 400), (1350, 75)),
-                                                      manager=manager)
+
     running = True
+    click = False
+
+    email = pygame_gui.elements.UITextEntryLine(
+        relative_rect=pygame.Rect((115, 300), (1350, 75)), manager=manager, object_id="#email"
+    )
+    username = pygame_gui.elements.UITextEntryLine(
+        relative_rect=pygame.Rect((115, 400), (1350, 75)), manager=manager, object_id="#user"
+    )
+    new_pass = pygame_gui.elements.UITextEntryLine(
+        relative_rect=pygame.Rect((115, 500), (1350, 75)), manager=manager, object_id="#pass"
+    )
 
     while running:
-        screen.blit(bg_image, (0, 0))
         screen.fill(bg)
+        manager.draw_ui(screen)
+
+        # Display Text Labels
+        write("Forgot Password", font1, (255, 255, 255), screen, 600, 100)
+        write("Email:", font2, (255, 255, 255), screen, 120, 305)
+        write("Username:", font2, (255, 255, 255), screen, 120, 405)
+        write("New password:", font2, (255, 255, 255), screen, 120, 505)
+
+        # Buttons
+        mx, my = pygame.mouse.get_pos()
+        button_reset = pygame.Rect(120, 600, 300, 75)
+        pygame.draw.rect(screen, (33, 40, 45), button_reset)
+        write("Reset", font2, (255, 255, 255), screen, 210, 620)
+
+        button_back = pygame.Rect(1160, 600, 300, 75)
+        pygame.draw.rect(screen, (33, 40, 45), button_back)
+        write("Back", font2, (255, 255, 255), screen, 1280, 620)
+
+        # Update UI
+        refresh = clock.tick(60) / 1000
+        manager.update(refresh)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return
+            manager.process_events(event)
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                running = False
+
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                click = True
+
+        if button_reset.collidepoint((mx, my)) and click:
+            email_text = email.get_text().strip()
+            username_text = username.get_text().strip()
+            new_pass_text = new_pass.get_text().strip()
+
+            # Fetch user data
+            cursor.execute("SELECT email, username FROM USERS WHERE username = ?", (username_text,))
+            result = cursor.fetchone()
+
+            if result:
+                stored_email, stored_username = result
+                if stored_email == email_text and stored_username == username_text:
+                    # Update Password
+                    cursor.execute("UPDATE USERS SET password = ? WHERE username = ?", (new_pass_text, username_text))
+                    connection.commit()
+                    error_scr("Password Reset Successfully")
+                    start()
+                else:
+                    error_scr("Invalid Email or Username")
+            else:
+                error_scr("User not found")
+
+        if button_back.collidepoint((mx, my)) and click:
+            running = False
+
+        click = False
+        pygame.display.update()
 
 def menu():
     click = False
     while True:
         screen.fill(bg)
-        screen.blit(bg_image, (0, 0))
         pygame.display.set_caption("Altitude Adventures")
         write("Main Menu", font1, (255, 255, 255), screen, 630, 100)
 
@@ -313,7 +376,6 @@ def lselect():
     running = True
     while running:
         screen.fill(bg)
-        screen.blit(bg_image, (0, 0))
         pygame.display.set_caption("Altitude Adventures")
         write("Level Select", font1, (255, 255, 255), screen, 630, 100)
 
@@ -431,7 +493,6 @@ def game_opt():
         mx, my = pygame.mouse.get_pos()
 
         screen.fill(bg)
-        screen.blit(bg_image, (0, 0))
         pygame.display.set_caption("Altitude Adventures")
         write("Options",font1,(255,255,255),screen,680,100)
 

@@ -1,6 +1,4 @@
 import pygame
-import random
-import math
 import main
 
 player_image = pygame.image.load("player.png")
@@ -10,12 +8,13 @@ grass_img = pygame.image.load("grass.png")
 dirt_img = pygame.image.load("dirt.png")
 stone_img = pygame.image.load("stone.png")
 enemy_image = pygame.image.load("player.png")
+sky_img = pygame.image.load("sky.png")
 enemy_image = pygame.transform.scale(enemy_image, (50, 50))
 enemy_image.set_colorkey((105,106,106))
 TILE_SIZE = 50
 
 tilemap = [
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
