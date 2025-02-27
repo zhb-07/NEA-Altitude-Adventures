@@ -1,14 +1,14 @@
 import pygame
 import main
 
-player_image = pygame.image.load("player.png")
+player_image = pygame.image.load("images/player.png")
 player_image = pygame.transform.scale(player_image, (50, 50))
-player_image.set_colorkey((163,73,164))
-grass_img = pygame.image.load("grass.png")
-dirt_img = pygame.image.load("dirt.png")
-stone_img = pygame.image.load("stone.png")
-enemy_image = pygame.image.load("player.png")
-sky_img = pygame.image.load("sky.png")
+player_image.set_colorkey((255,255,255))
+grass_img = pygame.image.load("images/grass.png")
+dirt_img = pygame.image.load("images/dirt.png")
+stone_img = pygame.image.load("images/stone.png")
+enemy_image = pygame.image.load("images/player.png")
+sky_img = pygame.image.load("images/sky.png")
 enemy_image = pygame.transform.scale(enemy_image, (50, 50))
 enemy_image.set_colorkey((105,106,106))
 TILE_SIZE = 50
