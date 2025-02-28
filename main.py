@@ -267,13 +267,11 @@ def forgot_password():
         screen.fill(bg)
         manager.draw_ui(screen)
 
-        # Display Text Labels
         write("Forgot Password", font1, (255, 255, 255), screen, 600, 100)
         write("Email:", font2, (255, 255, 255), screen, 120, 305)
         write("Username:", font2, (255, 255, 255), screen, 120, 405)
         write("New password:", font2, (255, 255, 255), screen, 120, 505)
 
-        # Buttons
         mx, my = pygame.mouse.get_pos()
         button_reset = pygame.Rect(120, 600, 300, 75)
         pygame.draw.rect(screen, (33, 40, 45), button_reset)
@@ -283,7 +281,6 @@ def forgot_password():
         pygame.draw.rect(screen, (33, 40, 45), button_back)
         write("Back", font2, (255, 255, 255), screen, 1280, 620)
 
-        # Update UI
         refresh = clock.tick(60) / 1000
         manager.update(refresh)
 
@@ -304,14 +301,12 @@ def forgot_password():
             username_text = username.get_text().strip()
             new_pass_text = new_pass.get_text().strip()
 
-            # Fetch user data
             cursor.execute("SELECT email, username FROM USERS WHERE username = ?", (username_text,))
             result = cursor.fetchone()
 
             if result:
                 stored_email, stored_username = result
                 if stored_email == email_text and stored_username == username_text:
-                    # Update Password
                     cursor.execute("UPDATE USERS SET password = ? WHERE username = ?", (new_pass_text, username_text))
                     connection.commit()
                     error_scr("Password Reset Successfully")
@@ -537,8 +532,8 @@ def game_opt():
 def lvl1():
     player = game.Player(100, 500)
     ground_level = 730
-    platform1 = game.Platform(0, ground_level, 1535, 10)  # Example platform
-    platforms = [platform1]  # Add more platforms if needed
+    platform1 = game.Platform(0, ground_level, 1535, 10)
+    platforms = [platform1]
     running = True
     while running:
         screen.fill(bg)
