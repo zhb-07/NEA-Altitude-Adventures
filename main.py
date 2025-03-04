@@ -508,6 +508,10 @@ def game_opt():
         pygame.draw.rect(screen, (33, 40, 45), volume_increase)
         write("+", font2, (255, 255, 255), screen, 530, 170)
 
+        exitbtn = pygame.Rect(100, 700, 200, 75)
+        pygame.draw.rect(screen, (33, 40, 45), exitbtn)
+        write("Exit lvl 1", font2, (255, 255, 255), screen, 130, 730)
+
         if volume_increase.collidepoint((mx,my)):
             if click:
                 vol = vol + 0.1
@@ -517,6 +521,10 @@ def game_opt():
             if click:
                 vol = vol - 0.1
                 click = False
+
+        elif exitbtn.collidepoint((mx,my)):
+            if click:
+                lselect()
 
         pygame.display.update()
 
@@ -534,7 +542,6 @@ def game_opt():
                 if event.button == 1:
                     click = True
 
-
 def draw_tilemap(screen, camera):
     for row_index, row in enumerate(game.tilemap):
         for col_index, tile in enumerate(row):
@@ -548,22 +555,21 @@ def draw_tilemap(screen, camera):
             elif tile == 2:
                 screen.blit(game.stone_img, (x, y))
 
-
 def lvl1():
-    player = game.Player(100, 500)
+    player = game.Player(773, 500)
     ground_level = 730
     platform1 = game.Platform(0, ground_level, 1535, 10)
     platforms = [platform1]
-    camera = game.Camera(width, height)  # Instantiate the camera
+    camera = game.Camera(width, height)
     running = True
     while running:
         screen.fill(bg)
-        draw_tilemap(screen, camera)  # Pass camera for scrolling effect
+        draw_tilemap(screen, camera)
         keys = pygame.key.get_pressed()
-        player.move(keys)
+        player.move(keys,0.01)
         player.apply_gravity(platforms)
         player.draw(screen)
-        camera.update(player)  # Update the camera position
+        camera.update(player)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -574,8 +580,7 @@ def lvl1():
                     game_opt()
 
         pygame.display.update()
-        clock.tick(60)
-
+        clock.tick
 
 def lvl2():
     return
