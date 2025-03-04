@@ -580,7 +580,7 @@ def lvl1():
                     game_opt()
 
         pygame.display.update()
-        clock.tick
+        clock.tick()
 
 def lvl2():
     return
