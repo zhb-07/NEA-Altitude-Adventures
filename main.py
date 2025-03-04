@@ -5,7 +5,7 @@ import game
 
 pygame.init()
 pygame.mixer.init()
-pygame.mixer.music.load("Acoustic_Alititude_1.mp3")
+pygame.mixer.music.load("sounds/bg_sound.mp3")
 pygame.mixer.music.play(loops = -1)
 height = 805
 width = 1535
@@ -267,11 +267,13 @@ def forgot_password():
         screen.fill(bg)
         manager.draw_ui(screen)
 
+        # Display Text Labels
         write("Forgot Password", font1, (255, 255, 255), screen, 600, 100)
         write("Email:", font2, (255, 255, 255), screen, 120, 305)
         write("Username:", font2, (255, 255, 255), screen, 120, 405)
         write("New password:", font2, (255, 255, 255), screen, 120, 505)
 
+        # Buttons
         mx, my = pygame.mouse.get_pos()
         button_reset = pygame.Rect(120, 600, 300, 75)
         pygame.draw.rect(screen, (33, 40, 45), button_reset)
@@ -281,6 +283,7 @@ def forgot_password():
         pygame.draw.rect(screen, (33, 40, 45), button_back)
         write("Back", font2, (255, 255, 255), screen, 1280, 620)
 
+        # Update UI
         refresh = clock.tick(60) / 1000
         manager.update(refresh)
 
@@ -301,12 +304,14 @@ def forgot_password():
             username_text = username.get_text().strip()
             new_pass_text = new_pass.get_text().strip()
 
+            # Fetch user data
             cursor.execute("SELECT email, username FROM USERS WHERE username = ?", (username_text,))
             result = cursor.fetchone()
 
             if result:
                 stored_email, stored_username = result
                 if stored_email == email_text and stored_username == username_text:
+                    # Update Password
                     cursor.execute("UPDATE USERS SET password = ? WHERE username = ?", (new_pass_text, username_text))
                     connection.commit()
                     error_scr("Password Reset Successfully")
@@ -529,29 +534,48 @@ def game_opt():
                 if event.button == 1:
                     click = True
 
+
+def draw_tilemap(screen, camera):
+    for row_index, row in enumerate(game.tilemap):
+        for col_index, tile in enumerate(row):
+            x = col_index * game.TILE_SIZE - camera.offset_x
+            y = row_index * game.TILE_SIZE - camera.offset_y
+
+            if tile == 0:
+                screen.blit(game.grass_img, (x, y))
+            elif tile == 1:
+                screen.blit(game.dirt_img, (x, y))
+            elif tile == 2:
+                screen.blit(game.stone_img, (x, y))
+
+
 def lvl1():
     player = game.Player(100, 500)
     ground_level = 730
     platform1 = game.Platform(0, ground_level, 1535, 10)
     platforms = [platform1]
+    camera = game.Camera(width, height)  # Instantiate the camera
     running = True
     while running:
         screen.fill(bg)
-        game.draw_tilemap()
+        draw_tilemap(screen, camera)  # Pass camera for scrolling effect
         keys = pygame.key.get_pressed()
         player.move(keys)
         player.apply_gravity(platforms)
         player.draw(screen)
+        camera.update(player)  # Update the camera position
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-
+                exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     game_opt()
 
         pygame.display.update()
         clock.tick(60)
+
 
 def lvl2():
     return

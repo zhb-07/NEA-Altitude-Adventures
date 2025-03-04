@@ -1,5 +1,4 @@
 import pygame
-import main
 
 player_image = pygame.image.load("images/player.png")
 player_image = pygame.transform.scale(player_image, (50, 50))
@@ -14,9 +13,9 @@ enemy_image.set_colorkey((105,106,106))
 TILE_SIZE = 50
 
 tilemap = [
-    [3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -32,18 +31,19 @@ tilemap = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ]
 
-def draw_tilemap():
+def draw_tilemap(screen, camera):
     for row_index, row in enumerate(tilemap):
         for col_index, tile in enumerate(row):
-            x = col_index * TILE_SIZE
-            y = row_index * TILE_SIZE
+            x = col_index * TILE_SIZE - camera.offset_x
+            y = row_index * TILE_SIZE - camera.offset_y
 
             if tile == 0:
-                main.screen.blit(grass_img, (x, y))
+                screen.blit(grass_img, (x, y))
             elif tile == 1:
-                main.screen.blit(dirt_img, (x, y))
+                screen.blit(dirt_img, (x, y))
             elif tile == 2:
-                main.screen.blit(stone_img, (x, y))
+                screen.blit(stone_img, (x, y))
+
 
 class Player:
     def __init__(self, x, y):
@@ -60,28 +60,46 @@ class Player:
             self.rect.x -= self.velocity
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             self.rect.x += self.velocity
-        if keys[pygame.K_SPACE] and self.grounded or keys[pygame.K_w] and self.grounded or keys[pygame.K_UP] and self.grounded:
+        if (keys[pygame.K_SPACE] or keys[pygame.K_w] or keys[pygame.K_UP]) and self.grounded:
             self.jump()
-
-    def jump(self):
-        self.y_velocity = self.jump_power
-        self.grounded = False
 
     def apply_gravity(self, platforms):
         self.y_velocity += self.gravity
         self.rect.y += self.y_velocity
         self.grounded = False
 
-        for platform in platforms:  # Ensure platforms is a list!
+        for platform in platforms:
             if self.rect.colliderect(platform.rect) and self.y_velocity > 0:
                 self.rect.bottom = platform.rect.top
                 self.y_velocity = 0
                 self.grounded = True
 
+    def jump(self):
+        self.y_velocity = self.jump_power
+
     def draw(self, screen):
-        screen.blit(self.image, self.rect.topleft)
+        screen.blit(self.image, self.rect.topleft)  # Draws the player on the screen
+
+
+
 
 class Platform:
     def __init__(self, x, y, width, height):
         self.rect = pygame.Rect(x, y, width, height)
+
+class Camera:
+    def __init__(self, width, height):
+        self.offset_x = 0
+        self.offset_y = 0
+        self.width = width
+        self.height = height
+
+    def update(self, player):
+        # Center the camera on the player
+        self.offset_x = player.rect.x - self.width // 2
+        self.offset_y = player.rect.y - self.height // 2
+
+        # Prevent camera from showing out-of-bounds areas
+        self.offset_x = max(0, min(self.offset_x, (len(tilemap[0]) * TILE_SIZE) - self.width))
+        self.offset_y = max(0, min(self.offset_y, (len(tilemap) * TILE_SIZE) - self.height))
 
