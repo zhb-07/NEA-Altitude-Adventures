@@ -542,31 +542,18 @@ def game_opt():
                 if event.button == 1:
                     click = True
 
-def draw_tilemap(screen, camera):
-    for row_index, row in enumerate(game.tilemap):
-        for col_index, tile in enumerate(row):
-            x = col_index * game.TILE_SIZE - camera.offset_x
-            y = row_index * game.TILE_SIZE - camera.offset_y
-
-            if tile == 0:
-                screen.blit(game.grass_img, (x, y))
-            elif tile == 1:
-                screen.blit(game.dirt_img, (x, y))
-            elif tile == 2:
-                screen.blit(game.stone_img, (x, y))
-
 def lvl1():
     player = game.Player(773, 500)
     ground_level = 730
     platform1 = game.Platform(0, ground_level, 1535, 10)
     platforms = [platform1]
-    camera = game.Camera(width, height)
+    camera = game.Camera(width, height, game.tilemap)
     running = True
     while running:
         screen.fill(bg)
-        draw_tilemap(screen, camera)
+        game.draw_tilemap(screen, camera)
         keys = pygame.key.get_pressed()
-        player.move(keys,0.01)
+        player.move(keys,0.1)
         player.apply_gravity(platforms)
         player.draw(screen)
         camera.update(player)
