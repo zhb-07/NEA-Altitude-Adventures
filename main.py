@@ -23,11 +23,12 @@ cursor.execute("""
         password TEXT
     )
 """)
-connection.commit()
+connection.commit() 
 font1 = pygame.font.SysFont(None, 75)
 font2 = pygame.font.SysFont(None, 35)
 font3 = pygame.font.SysFont(None, 50)
 lvl = 1
+clock.tick(120)
 
 print("I LOVE ONIONS!!!!!!!!!!!")
 print("Hello World!")
@@ -441,7 +442,6 @@ def opt():
         pygame.mixer.music.set_volume(vol)
         mx, my = pygame.mouse.get_pos()
         screen.fill(bg)
-        screen.blit(bg_image, (0, 0))
         pygame.display.set_caption("Altitude Adventures")
         write("Options",font1,(255,255,255),screen,680,100)
 
@@ -491,10 +491,9 @@ def game_opt():
     while running:
         pygame.mixer.music.set_volume(vol)
         mx, my = pygame.mouse.get_pos()
-
         screen.fill(bg)
         pygame.display.set_caption("Altitude Adventures")
-        write("Options",font1,(255,255,255),screen,680,100)
+        write("Options", font1, (255, 255, 255), screen, 680, 100)
 
         volume = pygame.Rect(100, 150, 410, 75)
         pygame.draw.rect(screen, (33, 40, 45), volume)
@@ -508,23 +507,15 @@ def game_opt():
         pygame.draw.rect(screen, (33, 40, 45), volume_increase)
         write("+", font2, (255, 255, 255), screen, 530, 170)
 
-        exitbtn = pygame.Rect(100, 700, 200, 75)
-        pygame.draw.rect(screen, (33, 40, 45), exitbtn)
-        write("Exit lvl 1", font2, (255, 255, 255), screen, 130, 730)
-
-        if volume_increase.collidepoint((mx,my)):
+        if volume_increase.collidepoint((mx, my)):
             if click:
                 vol = vol + 0.1
                 click = False
 
-        elif volume_decrease.collidepoint((mx,my)):
+        elif volume_decrease.collidepoint((mx, my)):
             if click:
                 vol = vol - 0.1
                 click = False
-
-        elif exitbtn.collidepoint((mx,my)):
-            if click:
-                lselect()
 
         pygame.display.update()
 
@@ -536,38 +527,46 @@ def game_opt():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
+                    return
                     running = False
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
 
+
 def lvl1():
     player = game.Player(773, 500)
     ground_level = 730
     platform1 = game.Platform(0, ground_level, 1535, 10)
     platforms = [platform1]
-    camera = game.Camera(width, height, game.tilemap)
+
+    camera = game.Camera(width, height)  # ✅ Removed extra tilemap argument
+
     running = True
     while running:
         screen.fill(bg)
         game.draw_tilemap(screen, camera)
+
         keys = pygame.key.get_pressed()
-        player.move(keys,0.1)
+        player.move(keys, 0.2)
         player.apply_gravity(platforms)
         player.draw(screen)
         camera.update(player)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    game_opt()
+                running = False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                game_opt()
 
         pygame.display.update()
-        clock.tick()
+        clock.tick_busy_loop(120)  # More accurate FPS control
+
+    pygame.quit()
+    exit()
+
+
 
 def lvl2():
     return
