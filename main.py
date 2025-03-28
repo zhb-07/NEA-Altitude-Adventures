@@ -1,20 +1,21 @@
 import pygame
 import pygame_gui
 import sqlite3
-import physics
+
+from config import screen_width
+from config import screen_height
+from config import screen
+
 
 pygame.init()
 pygame.mixer.init()
 pygame.mixer.music.load("sounds/bg_sound.mp3")
 pygame.mixer.music.play(loops = -1)
-height = 800
-width = 1500
 bg = (89, 120, 142)
 bg_image = pygame.image.load("images/bg_image.png")
-screen = pygame.display.set_mode((width, height))
 clock = pygame.time.Clock()
 fps = 60
-manager = pygame_gui.UIManager((width, height))
+manager = pygame_gui.UIManager((screen_width, screen_height))
 connection = sqlite3.connect("Users.DB")
 cursor = connection.cursor()
 cursor.execute("""
@@ -533,16 +534,21 @@ def game_opt():
                 if event.button == 1:
                     click = True
 
-
 def lvl1():
-    world = game.World(game.tilemap, screen)
-    player = game.Player(100, height - 130, screen)
+
+    from physics import World, tilemap,Player,Spikes,game_over
+    spike_group = pygame.sprite.Group()
+    world = World(tilemap, screen)
+    player = Player(100, screen_height - 130, screen)
     running = True
     while running:
+        screen.fill(bg)
         clock.tick(fps)
 
         world.draw()
-        player.update(screen)
+        spike_group.draw(screen)
+
+        game_over = player.update(screen, game_over)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -552,7 +558,6 @@ def lvl1():
         pygame.display.update()
 
     pygame.quit()
-
 
 def lvl2():
     return
