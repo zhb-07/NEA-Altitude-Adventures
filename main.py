@@ -1,18 +1,19 @@
 import pygame
 import pygame_gui
 import sqlite3
-import game
+import physics
 
 pygame.init()
 pygame.mixer.init()
 pygame.mixer.music.load("sounds/bg_sound.mp3")
 pygame.mixer.music.play(loops = -1)
-height = 805
-width = 1535
+height = 800
+width = 1500
 bg = (89, 120, 142)
 bg_image = pygame.image.load("images/bg_image.png")
 screen = pygame.display.set_mode((width, height))
 clock = pygame.time.Clock()
+fps = 60
 manager = pygame_gui.UIManager((width, height))
 connection = sqlite3.connect("Users.DB")
 cursor = connection.cursor()
@@ -23,13 +24,11 @@ cursor.execute("""
         password TEXT
     )
 """)
-connection.commit() 
+connection.commit()
 font1 = pygame.font.SysFont(None, 75)
 font2 = pygame.font.SysFont(None, 35)
 font3 = pygame.font.SysFont(None, 50)
 lvl = 1
-clock.tick(120)
-
 print("I LOVE ONIONS!!!!!!!!!!!")
 print("Hello World!")
 
@@ -536,24 +535,14 @@ def game_opt():
 
 
 def lvl1():
-    player = game.Player(773, 500)
-    ground_level = 730
-    platform1 = game.Platform(0, ground_level, 1535, 10)
-    platforms = [platform1]
-
-    camera = game.Camera(width, height)  # ✅ Removed extra tilemap argument
-
+    world = game.World(game.tilemap, screen)
+    player = game.Player(100, height - 130, screen)
     running = True
     while running:
-        screen.fill(bg)
-        game.draw_tilemap(screen, camera)
+        clock.tick(fps)
 
-        keys = pygame.key.get_pressed()
-        player.move(keys, 0.2)
-        player.apply_gravity(platforms)
-        player.draw(screen)
-        camera.update(player)
-
+        world.draw()
+        player.update(screen)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -561,11 +550,8 @@ def lvl1():
                 game_opt()
 
         pygame.display.update()
-        clock.tick_busy_loop(120)  # More accurate FPS control
 
     pygame.quit()
-    exit()
-
 
 
 def lvl2():
