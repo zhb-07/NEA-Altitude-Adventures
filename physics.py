@@ -1,5 +1,4 @@
 import pygame
-from pygame.examples.cursors import image
 from pygame.sprite import Sprite
 
 from config import screen_height
@@ -18,22 +17,22 @@ sky_img = pygame.image.load("images/sky.png")
 tile_size = 50
 game_over = False
 
-tilemap = [
+tilemap = [ #                                    30 x 16
     "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
     "x............................x",
     "x............................x",
+    "x...............xxxx.xxxxxxxxx",
+    "x..........xxx...............x",
+    "x.......x....................x",
     "x............................x",
     "x............................x",
+    "x..xxx......x...w............x",
+    "x............xxxxxxx.........x",
     "x............................x",
-    "x............................x",
-    "x............................x",
-    "x............................x",
-    "x............................x",
-    "x............................x",
-    "x............................x",
-    "x............................x",
-    "x.....xx.....................x",
-    "x....x..//...................x",
+    "x.......................x....x",
+    "x.......xx...xx...xxxxxxxxxxxx",
+    "x.....xxxx^^^xx^^^xxxxxxxxxxxx",
+    "x....xxxxxxxxxxxxxxxxxxxxxxxxx",
     "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
 ]
 
@@ -56,17 +55,13 @@ class World:
                     tile = (img, img_rect)
                     self.tile_list.append(tile)
 
-                elif tile == "-":
-                    img = pygame.transform.scale(sky_img, (tile_size, tile_size))
+                elif tile == "^":
+                    img = pygame.transform.scale(spikes_img, (tile_size, tile_size))
                     img_rect = img.get_rect()
                     img_rect.x = collumn_count * tile_size
                     img_rect.y = row_count * tile_size
                     tile = (img, img_rect)
                     self.tile_list.append(tile)
-
-                elif tile == "/":
-                    spike = Spikes(collumn_count * tile_size, row_count * tile_size)
-                    spike_group.add(spike)
 
                 collumn_count += 1
             row_count += 1
@@ -74,7 +69,6 @@ class World:
     def draw(self):
         for tile in self.tile_list:
             self.screen.blit(tile[0], tile[1])
-            pygame.draw.rect(screen, (255, 255, 255), tile[1], 2)
 
 class Player:
     def __init__(self, x, y, screen):
@@ -138,7 +132,7 @@ class Player:
                 dy = 0
 
             screen.blit(self.image, self.rect)
-            pygame.draw.rect(screen, (255, 255, 255), self.rect, 2)
+
 
             return game_over
 

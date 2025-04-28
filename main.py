@@ -374,8 +374,13 @@ def menu():
 
 def lselect():
     click = False
+
+    key = pygame.key.get_pressed()
+
     running = True
     while running:
+
+
         screen.fill(bg)
         pygame.display.set_caption("Altitude Adventures")
         write("Level Select", font1, (255, 255, 255), screen, 630, 100)
@@ -412,7 +417,7 @@ def lselect():
         pygame.draw.rect(screen, (33, 40, 45), button1)
         pygame.draw.rect(screen, (33, 40, 45), button2)
         pygame.draw.rect(screen, (33, 40, 45), button3)
-        pygame.draw.rect(screen,(33,40,45),button4)
+        pygame.draw.rect(screen, (33, 40 ,45), button4)
         pygame.draw.rect(screen, (33, 40, 45), button5)
         click = False
         write("Level One", font1, (255, 255, 255), screen, 615, 300)
@@ -428,7 +433,9 @@ def lselect():
                 if event.button == 1:
                     click = True
 
-        pygame.display.update()
+            if key[pygame.K_ESCAPE] == True:
+                return
+            pygame.display.update()
 
 def leaderboard():
     return
@@ -528,7 +535,6 @@ def game_opt():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return
-                    running = False
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
