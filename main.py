@@ -6,7 +6,6 @@ from config import screen_width
 from config import screen_height
 from config import screen
 
-
 pygame.init()
 pygame.mixer.init()
 pygame.mixer.music.load("sounds/bg_sound.mp3")
@@ -30,8 +29,15 @@ font1 = pygame.font.SysFont(None, 75)
 font2 = pygame.font.SysFont(None, 35)
 font3 = pygame.font.SysFont(None, 50)
 lvl = 1
-print("I LOVE ONIONS!!!!!!!!!!!")
-print("Hello World!")
+
+player1 = pygame.image.load("images/player.png")
+player1.set_colorkey((255, 255, 255))
+
+player2 = pygame.image.load("images/player2.png")
+player2.set_colorkey((255, 255, 255))
+
+player3 = pygame.image.load("images/player3.png")
+player3.set_colorkey((255, 255, 255))
 
 def write(text, font, colour, surface, x, y):
     obj = font.render(text, True, colour)
@@ -394,7 +400,7 @@ def lselect():
         button5 = pygame.Rect(615, 690, 300, 75)
         if button1.collidepoint((mx, my)):
             if click:
-                lvl1()
+                lvl1(lvl)
         if button2.collidepoint((mx, my)):
             if click:
                 if lvl == 2:
@@ -540,19 +546,32 @@ def game_opt():
                 if event.button == 1:
                     click = True
 
-def lvl1():
+def lvl1(lvl):
 
-    from physics import World, tilemap,Player,Spikes,game_over
-    spike_group = pygame.sprite.Group()
+    from physics import World, tilemap,Player,Spikes,game_over,en_group,spike_group,coin_group
     world = World(tilemap, screen)
     player = Player(100, screen_height - 130, screen)
     running = True
+    start_ticks = pygame.time.get_ticks()
+    score = 0
     while running:
+
+        if game_over == True:
+            running = False
+
         screen.fill(bg)
         clock.tick(fps)
 
         world.draw()
+
+        if game_over == False:
+            en_group.update()
+            if pygame.sprite.spritecollide(player, coin_group, True):
+                score = score + 100
+
+        en_group.draw(screen)
         spike_group.draw(screen)
+        coin_group.draw(screen)
 
         game_over = player.update(screen, game_over)
         for event in pygame.event.get():
@@ -561,9 +580,15 @@ def lvl1():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 game_opt()
 
+        seconds = (pygame.time.get_ticks() - start_ticks) // 1000
+        timer_text = font2.render(f"Time: {seconds}s", True, (255, 255, 255))
+        screen.blit(timer_text, (20, 20))
+        score_text = font2.render(f"Score: {score}", True, (255, 255, 255))
+        screen.blit(score_text, (20, 40))
         pygame.display.update()
 
     pygame.quit()
+    return lvl
 
 def lvl2():
     return
@@ -572,6 +597,51 @@ def lvl3():
     return
 
 def char_select():
-    return
+    running = True
+    click = False
+    key = pygame.key.get_pressed()
+    player_list = [player1, player2, player3]
+    while running:
+        screen.fill((bg))
+        mx, my = pygame.mouse.get_pos()
+        pygame.display.set_caption("Altitude Adventures")
+        write("Character Select", font1, (255, 255, 255), screen, 600, 100)
+
+        selectbtn = pygame.Rect(615, 690, 300, 75)
+        nextbtn = pygame.Rect(930, 690, 300, 75)
+        previousbtn = pygame.Rect(300, 690, 300, 75)
+        backbtn = pygame.Rect(50, 50, 300, 75)
+
+        if selectbtn.collidepoint((mx, my)):
+            if click:
+                pass
+        if nextbtn.collidepoint((mx, my)):
+            if click:
+                pass
+        if previousbtn.collidepoint((mx, my)):
+            if click:
+                pass
+        if backbtn.collidepoint((mx, my)):
+            if click:
+                pass
+
+        pygame.draw.rect(screen, (33, 40, 45), selectbtn)
+        pygame.draw.rect(screen, (33, 40, 45), nextbtn)
+        pygame.draw.rect(screen, (33, 40, 45), previousbtn)
+        pygame.draw.rect(screen, (33, 40, 45), backbtn)
+
+        screen.blit(player1,(500,500))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+
+            if key[pygame.K_ESCAPE] == True:
+                return
+        pygame.display.update()
 
 start()

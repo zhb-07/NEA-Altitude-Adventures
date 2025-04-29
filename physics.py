@@ -1,5 +1,5 @@
 import pygame
-from pygame.sprite import Sprite
+import pickle
 
 from config import screen_height
 from config import screen
@@ -9,10 +9,19 @@ player_image.set_colorkey((255, 255, 255))
 
 grass_img = pygame.image.load("images/grass.png")
 spikes_img = pygame.image.load("images/spikes.png")
+spikes_img.set_colorkey((190, 239, 254))
+
 dirt_img = pygame.image.load("images/dirt.png")
 stone_img = pygame.image.load("images/stone.png")
-enemy_image = pygame.image.load("images/player.png")
+enemy_image = pygame.image.load("images/enemy.png")
+enemy_image.set_colorkey((255, 255, 255))
+
 sky_img = pygame.image.load("images/sky.png")
+
+spike_group = pygame.sprite.Group()
+en_group = pygame.sprite.Group()
+coin_group = pygame.sprite.Group()
+
 
 tile_size = 50
 game_over = False
@@ -20,16 +29,16 @@ game_over = False
 tilemap = [ #                                    30 x 16
     "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
     "x............................x",
-    "x............................x",
+    "x................0......0....x",
     "x...............xxxx.xxxxxxxxx",
     "x..........xxx...............x",
     "x.......x....................x",
     "x............................x",
+    "x..0.........................x",
+    "x..xxx......x0...e...........x",
+    "x............xxxxxxxxx...x...x",
     "x............................x",
-    "x..xxx......x...w............x",
-    "x............xxxxxxx.........x",
-    "x............................x",
-    "x.......................x....x",
+    "x.........................0.xx",
     "x.......xx...xx...xxxxxxxxxxxx",
     "x.....xxxx^^^xx^^^xxxxxxxxxxxx",
     "x....xxxxxxxxxxxxxxxxxxxxxxxxx",
@@ -56,12 +65,16 @@ class World:
                     self.tile_list.append(tile)
 
                 elif tile == "^":
-                    img = pygame.transform.scale(spikes_img, (tile_size, tile_size))
-                    img_rect = img.get_rect()
-                    img_rect.x = collumn_count * tile_size
-                    img_rect.y = row_count * tile_size
-                    tile = (img, img_rect)
-                    self.tile_list.append(tile)
+                    spike = Spikes(collumn_count * tile_size, row_count * tile_size)
+                    spike_group.add(spike)
+
+                elif tile == "e":
+                    en = Enemy(collumn_count * tile_size, row_count * tile_size - 5)
+                    en_group.add(en)
+
+                elif tile == "0":
+                    coin = Coins(collumn_count * tile_size + 25, row_count * tile_size)
+                    coin_group.add(coin)
 
                 collumn_count += 1
             row_count += 1
@@ -121,30 +134,53 @@ class Player:
                         dy = tile[1].top - self.rect.bottom
                         self.y_vel = 0
 
-            if pygame.sprite.spritecollide(self,spike_group, False):
+            if pygame.sprite.spritecollide(self, en_group, False):
                 game_over = True
+
+            if pygame.sprite.spritecollide(self, spike_group, False):
+                game_over = True
+
+
 
             self.rect.x = self.rect.x + dx
             self.rect.y = self.rect.y + dy
 
-            if self.rect.bottom > screen_height:
-                self.rect.bottom = screen_height
-                dy = 0
-
             screen.blit(self.image, self.rect)
-
-
             return game_over
 
 class Spikes(pygame.sprite.Sprite):
-    def __init__(self,x,y):
-        pygame.sprite,Sprite.__init__(self)
-        self.image = pygame.transform.scale(spikes_img, (tile_size, tile_size // 2))
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        image = pygame.image.load("images/spikes.png")
+        self.image = pygame.transform.scale(image, (50,50))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
 
+class Coins(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        image = pygame.image.load("images/coin.png")
+        self.image = pygame.transform.scale(image, (25,25))
+        self.rect = self.image.get_rect()
+        self.rect.center = (x,y)
 
-spike_group = pygame.sprite.Group()
+
+class Enemy (pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load("images/enemy.png")
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.direction = 1
+        self.move = 0
+
+    def update(self):
+        self.rect.x = self.rect.x + self.direction
+        self.move = self.move + 1
+        if abs(self.move) > 50:
+            self.direction = self.direction * -1
+            self.move = self.move * -1
 world = World(tilemap, screen)
 player = Player(100, screen_height - 130, screen)
