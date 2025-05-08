@@ -1,27 +1,23 @@
 import pygame
-import pickle
-
-from config import screen_height
-from config import screen
-
-player_image = pygame.image.load("images/player.png")
-player_image.set_colorkey((255, 255, 255))
+import config
 
 grass_img = pygame.image.load("images/grass.png")
-spikes_img = pygame.image.load("images/spikes.png")
-spikes_img.set_colorkey((190, 239, 254))
-
 dirt_img = pygame.image.load("images/dirt.png")
 stone_img = pygame.image.load("images/stone.png")
-enemy_image = pygame.image.load("images/enemy.png")
-enemy_image.set_colorkey((255, 255, 255))
-
 sky_img = pygame.image.load("images/sky.png")
+
+screen = config.screen
+screen_width = config.screen_width
+screen_height = config.screen_height
+player_image = config.playerimg
+player_image.set_colorkey((255, 255, 255))
+player_image = pygame.transform.scale(player_image, (50,50))
 
 spike_group = pygame.sprite.Group()
 en_group = pygame.sprite.Group()
 coin_group = pygame.sprite.Group()
 
+print(config.playerimg)
 
 tile_size = 50
 game_over = False
@@ -105,16 +101,16 @@ class Player:
             key = pygame.key.get_pressed()
 
             if key[pygame.K_w] and self.jumped == False or  key[pygame.K_SPACE] and self.jumped == False:
-                self.y_vel = -3
+                self.y_vel = -10
                 self.jumped = True
-            if key[pygame.K_w] == False or  key[pygame.K_SPACE] == False:
+            else:
                 self.jumped = False
 
             if key[pygame.K_a]:
-                dx = dx - 1
+                dx = dx - 3
 
             if key[pygame.K_d]:
-                dx = dx + 1
+                dx = dx + 3
 
             self.y_vel = self.y_vel + 1
             if self.y_vel > 10:
@@ -152,6 +148,7 @@ class Spikes(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         image = pygame.image.load("images/spikes.png")
+        image.set_colorkey((255, 255, 255))
         self.image = pygame.transform.scale(image, (50,50))
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -161,6 +158,7 @@ class Coins(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         image = pygame.image.load("images/coin.png")
+        image.set_colorkey((255, 255, 255))
         self.image = pygame.transform.scale(image, (25,25))
         self.rect = self.image.get_rect()
         self.rect.center = (x,y)
@@ -170,6 +168,7 @@ class Enemy (pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load("images/enemy.png")
+        self.image.set_colorkey((255, 255, 255))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y

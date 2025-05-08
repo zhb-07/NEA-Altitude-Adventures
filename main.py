@@ -1,20 +1,28 @@
+# imports
 import pygame
 import pygame_gui
 import sqlite3
+import config
 
-from config import screen_width
-from config import screen_height
-from config import screen
+#game variables
+screen = config.screen
+screen_width = config.screen_width
+screen_height = config.screen_height
 
 pygame.init()
 pygame.mixer.init()
+
 pygame.mixer.music.load("sounds/bg_sound.mp3")
 pygame.mixer.music.play(loops = -1)
+
 bg = (89, 120, 142)
 bg_image = pygame.image.load("images/bg_image.png")
+
 clock = pygame.time.Clock()
 fps = 60
+
 manager = pygame_gui.UIManager((screen_width, screen_height))
+
 connection = sqlite3.connect("Users.DB")
 cursor = connection.cursor()
 cursor.execute("""
@@ -25,25 +33,38 @@ cursor.execute("""
     )
 """)
 connection.commit()
+
 font1 = pygame.font.SysFont(None, 75)
 font2 = pygame.font.SysFont(None, 35)
 font3 = pygame.font.SysFont(None, 50)
+
 lvl = 1
 
 player1 = pygame.image.load("images/player.png")
+player1 = pygame.transform.scale(player1, (500,500))
 player1.set_colorkey((255, 255, 255))
 
 player2 = pygame.image.load("images/player2.png")
+player2 = pygame.transform.scale(player2, (500,500))
 player2.set_colorkey((255, 255, 255))
 
 player3 = pygame.image.load("images/player3.png")
+player3 = pygame.transform.scale(player3, (500,500))
 player3.set_colorkey((255, 255, 255))
+
+playerimg = None
 
 def write(text, font, colour, surface, x, y):
     obj = font.render(text, True, colour)
     rect = obj.get_rect()
     rect.topleft = (x, y)
     surface.blit(obj, rect)
+
+def button(x, y, text):
+
+    b = pygame.Rect(x, y, 300, 75)
+    pygame.draw.rect(screen, (33, 40, 45), b)
+    write(text, font1, (255,255,255),screen,x + 10 , y + 10)
 
 def error_scr(message):
     run = True
@@ -429,7 +450,7 @@ def lselect():
         write("Level One", font1, (255, 255, 255), screen, 615, 300)
         write("Level Two", font1, (255, 255, 255), screen, 615, 400)
         write("Level Three", font1, (255, 255, 255), screen, 615, 500)
-        write ("Character Select",font3,(255,255,255),screen,615,600)
+        write("Character Select",font3,(255,255,255),screen,615,600)
         write("Back", font1, (255, 255, 255), screen, 615, 700)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -548,7 +569,7 @@ def game_opt():
 
 def lvl1(lvl):
 
-    from physics import World, tilemap,Player,Spikes,game_over,en_group,spike_group,coin_group
+    from physics import World, tilemap,Player,game_over,en_group,spike_group,coin_group
     world = World(tilemap, screen)
     player = Player(100, screen_height - 130, screen)
     running = True
@@ -590,47 +611,59 @@ def lvl1(lvl):
     pygame.quit()
     return lvl
 
-def lvl2():
+def lvl2(lvl):
     return
 
-def lvl3():
+def lvl3(lvl):
     return
 
 def char_select():
     running = True
     click = False
     key = pygame.key.get_pressed()
-    player_list = [player1, player2, player3]
+    show = player1
+    playerimg = player1
     while running:
         screen.fill((bg))
         mx, my = pygame.mouse.get_pos()
         pygame.display.set_caption("Altitude Adventures")
         write("Character Select", font1, (255, 255, 255), screen, 600, 100)
 
-        selectbtn = pygame.Rect(615, 690, 300, 75)
-        nextbtn = pygame.Rect(930, 690, 300, 75)
-        previousbtn = pygame.Rect(300, 690, 300, 75)
+        secondbtn = pygame.Rect(615, 690, 300, 75)
+        thirdbtn = pygame.Rect(930, 690, 300, 75)
+        firstbtn = pygame.Rect(300, 690, 300, 75)
         backbtn = pygame.Rect(50, 50, 300, 75)
 
-        if selectbtn.collidepoint((mx, my)):
+        if secondbtn.collidepoint((mx, my)):
             if click:
-                pass
-        if nextbtn.collidepoint((mx, my)):
+                show = player2
+                config.playerimg = player2
+
+        if thirdbtn.collidepoint((mx, my)):
             if click:
-                pass
-        if previousbtn.collidepoint((mx, my)):
+                show = player3
+                config.playerimg = player3
+
+        if firstbtn.collidepoint((mx, my)):
             if click:
-                pass
+                show = player1
+                config.playerimg = player1
+    
         if backbtn.collidepoint((mx, my)):
             if click:
-                pass
+                running = False
 
-        pygame.draw.rect(screen, (33, 40, 45), selectbtn)
-        pygame.draw.rect(screen, (33, 40, 45), nextbtn)
-        pygame.draw.rect(screen, (33, 40, 45), previousbtn)
+        pygame.draw.rect(screen, (33, 40, 45), secondbtn)
+        pygame.draw.rect(screen, (33, 40, 45), thirdbtn)
+        pygame.draw.rect(screen, (33, 40, 45), firstbtn)
         pygame.draw.rect(screen, (33, 40, 45), backbtn)
 
-        screen.blit(player1,(500,500))
+        write("One", font2, (255, 255, 255), screen,310 ,720)
+        write("Two", font2, (255, 255, 255), screen,630 ,720)
+        write("Three", font2, (255, 255, 255), screen,950 ,720)
+        write("Back", font2, (255, 255, 255), screen, 70, 70)
+
+        screen.blit(show, (500, 120))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -639,9 +672,15 @@ def char_select():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
+            else:
+                click = False
 
             if key[pygame.K_ESCAPE] == True:
                 return
         pygame.display.update()
+
+        key = pygame.key.get_pressed()
+
+        return playerimg
 
 start()
