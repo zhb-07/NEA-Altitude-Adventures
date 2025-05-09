@@ -1,10 +1,14 @@
+from enum import pickle_by_enum_name
+
 import pygame
 import config
+from maps import tilemap1_0
 
 grass_img = pygame.image.load("images/grass.png")
 dirt_img = pygame.image.load("images/dirt.png")
 stone_img = pygame.image.load("images/stone.png")
 sky_img = pygame.image.load("images/sky.png")
+exit_img = pygame.image.load("images/exit.png")
 
 screen = config.screen
 screen_width = config.screen_width
@@ -21,26 +25,6 @@ print(config.playerimg)
 
 tile_size = 50
 game_over = False
-
-tilemap = [ #                                    30 x 16
-    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    "x............................x",
-    "x................0......0....x",
-    "x...............xxxx.xxxxxxxxx",
-    "x..........xxx...............x",
-    "x.......x....................x",
-    "x............................x",
-    "x..0.........................x",
-    "x..xxx......x0...e...........x",
-    "x............xxxxxxxxx...x...x",
-    "x............................x",
-    "x.........................0.xx",
-    "x.......xx...xx...xxxxxxxxxxxx",
-    "x.....xxxx^^^xx^^^xxxxxxxxxxxx",
-    "x....xxxxxxxxxxxxxxxxxxxxxxxxx",
-    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-]
-
 
 class World:
 
@@ -64,13 +48,21 @@ class World:
                     spike = Spikes(collumn_count * tile_size, row_count * tile_size)
                     spike_group.add(spike)
 
-                elif tile == "e":
+                elif tile == "o":
                     en = Enemy(collumn_count * tile_size, row_count * tile_size - 5)
                     en_group.add(en)
 
                 elif tile == "0":
                     coin = Coins(collumn_count * tile_size + 25, row_count * tile_size)
                     coin_group.add(coin)
+
+                elif tile == "e":
+                    img = pygame.transform.scale(exit_img, (tile_size, tile_size))
+                    img_rect = img.get_rect()
+                    img_rect.x = collumn_count * tile_size
+                    img_rect.y = row_count * tile_size
+                    tile = (img, img_rect)
+                    self.tile_list.append(tile)
 
                 collumn_count += 1
             row_count += 1
@@ -102,7 +94,7 @@ class Player:
 
             if key[pygame.K_w] and self.jumped == False or  key[pygame.K_SPACE] and self.jumped == False:
                 self.y_vel = -10
-                self.jumped = True
+                self.jumped = False
             else:
                 self.jumped = False
 
@@ -129,6 +121,8 @@ class Player:
                     elif self.y_vel >= 0:
                         dy = tile[1].top - self.rect.bottom
                         self.y_vel = 0
+
+
 
             if pygame.sprite.spritecollide(self, en_group, False):
                 game_over = True
@@ -181,5 +175,6 @@ class Enemy (pygame.sprite.Sprite):
         if abs(self.move) > 50:
             self.direction = self.direction * -1
             self.move = self.move * -1
-world = World(tilemap, screen)
+
+world = World(tilemap1_0, screen)
 player = Player(100, screen_height - 130, screen)

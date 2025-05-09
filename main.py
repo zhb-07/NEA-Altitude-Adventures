@@ -23,6 +23,7 @@ fps = 60
 
 manager = pygame_gui.UIManager((screen_width, screen_height))
 
+#database
 connection = sqlite3.connect("Users.DB")
 cursor = connection.cursor()
 cursor.execute("""
@@ -34,12 +35,14 @@ cursor.execute("""
 """)
 connection.commit()
 
+#font sizes
 font1 = pygame.font.SysFont(None, 75)
 font2 = pygame.font.SysFont(None, 35)
 font3 = pygame.font.SysFont(None, 50)
 
 lvl = 1
 
+#player images for char_select
 player1 = pygame.image.load("images/player.png")
 player1 = pygame.transform.scale(player1, (500,500))
 player1.set_colorkey((255, 255, 255))
@@ -54,6 +57,7 @@ player3.set_colorkey((255, 255, 255))
 
 playerimg = None
 
+#wrie function (like screen.blit)
 def write(text, font, colour, surface, x, y):
     obj = font.render(text, True, colour)
     rect = obj.get_rect()
@@ -65,6 +69,16 @@ def button(x, y, text):
     b = pygame.Rect(x, y, 300, 75)
     pygame.draw.rect(screen, (33, 40, 45), b)
     write(text, font1, (255,255,255),screen,x + 10 , y + 10)
+
+class Button:
+    def __init__(self,x,y,text):
+        self.x = x
+        self.y = y
+        self.text = text
+        b = pygame.Rect(x, y, 300, 75)
+        pygame.draw.rect(screen, (33, 40, 45), b)
+        write(text, font1, (255, 255, 255), screen, x + 10, y + 10)
+
 
 def error_scr(message):
     run = True
@@ -425,22 +439,24 @@ def lselect():
         if button2.collidepoint((mx, my)):
             if click:
                 if lvl == 2:
-                    lvl2()
+                    lvl2(lvl)
                 else:
                     error_scr("Complete level 1")
 
         if button3.collidepoint((mx, my)):
             if click:
                 if lvl == 3:
-                    lvl3()
+                    lvl3(lvl)
                 else:
                     error_scr("Complete level 2")
         if button4.collidepoint((mx,my)):
             if click:
                 char_select()
+
         if button5.collidepoint((mx, my)):
             if click:
                 running = False
+
         pygame.draw.rect(screen, (33, 40, 45), button1)
         pygame.draw.rect(screen, (33, 40, 45), button2)
         pygame.draw.rect(screen, (33, 40, 45), button3)
@@ -542,14 +558,20 @@ def game_opt():
         write("+", font2, (255, 255, 255), screen, 530, 170)
 
         if volume_increase.collidepoint((mx, my)):
-            if click:
-                vol = vol + 0.1
-                click = False
+            if vol <= 0:
+                if click:
+                    vol = vol + 0.1
+                    click = False
 
         elif volume_decrease.collidepoint((mx, my)):
-            if click:
-                vol = vol - 0.1
-                click = False
+            if vol >= 1:
+                if click:
+                    vol = vol - 0.1
+                    click = False
+
+        vol_txt = str(round(vol * 100 ))
+        print(vol_txt)
+        write(vol_txt, font2, (255, 255, 255), screen, 310, 190)
 
         pygame.display.update()
 
@@ -569,26 +591,27 @@ def game_opt():
 
 def lvl1(lvl):
 
-    from physics import World, tilemap,Player,game_over,en_group,spike_group,coin_group
-    world = World(tilemap, screen)
+    from physics import World,Player,game_over,en_group,spike_group,coin_group
+    from maps import tilemap1_0
+    world = World(tilemap1_0, screen)
     player = Player(100, screen_height - 130, screen)
-    running = True
     start_ticks = pygame.time.get_ticks()
     score = 0
-    while running:
+    while config.running:
 
         if game_over == True:
-            running = False
+            config.running = False
 
         screen.fill(bg)
         clock.tick(fps)
+        seconds = (pygame.time.get_ticks() - start_ticks) // 1000
 
         world.draw()
 
         if game_over == False:
             en_group.update()
             if pygame.sprite.spritecollide(player, coin_group, True):
-                score = score + 100
+                score = (score + 100) - seconds
 
         en_group.draw(screen)
         spike_group.draw(screen)
@@ -596,12 +619,14 @@ def lvl1(lvl):
 
         game_over = player.update(screen, game_over)
         for event in pygame.event.get():
+
             if event.type == pygame.QUIT:
                 running = False
+                pygame.quit()
+
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 game_opt()
 
-        seconds = (pygame.time.get_ticks() - start_ticks) // 1000
         timer_text = font2.render(f"Time: {seconds}s", True, (255, 255, 255))
         screen.blit(timer_text, (20, 20))
         score_text = font2.render(f"Score: {score}", True, (255, 255, 255))
@@ -620,10 +645,10 @@ def lvl3(lvl):
 def char_select():
     running = True
     click = False
-    key = pygame.key.get_pressed()
     show = player1
-    playerimg = player1
+    playerimg = None
     while running:
+        key = pygame.key.get_pressed()
         screen.fill((bg))
         mx, my = pygame.mouse.get_pos()
         pygame.display.set_caption("Altitude Adventures")
@@ -677,9 +702,8 @@ def char_select():
 
             if key[pygame.K_ESCAPE] == True:
                 return
-        pygame.display.update()
 
-        key = pygame.key.get_pressed()
+        pygame.display.update()
 
         return playerimg
 
