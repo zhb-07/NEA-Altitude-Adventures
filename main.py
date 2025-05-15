@@ -64,21 +64,22 @@ def write(text, font, colour, surface, x, y):
     rect.topleft = (x, y)
     surface.blit(obj, rect)
 
-def button(x, y, text):
-
-    b = pygame.Rect(x, y, 300, 75)
-    pygame.draw.rect(screen, (33, 40, 45), b)
-    write(text, font1, (255,255,255),screen,x + 10 , y + 10)
-
 class Button:
-    def __init__(self,x,y,text):
+
+    def __init__(self, x, y, text):
         self.x = x
         self.y = y
         self.text = text
-        b = pygame.Rect(x, y, 300, 75)
-        pygame.draw.rect(screen, (33, 40, 45), b)
-        write(text, font1, (255, 255, 255), screen, x + 10, y + 10)
+        self.button = pygame.Rect(x, y, 300, 75)
+        pygame.draw.rect(screen, (33, 40, 45), self.button)
+        write(self.text, font1, (255, 255, 255), screen, (self.x + 10), (self.y + 10))
 
+    def click (self, pos):
+        if self.x < pos[0] < self.x + 300:
+            if self.y < pos[1] < self.y + 70:
+                return True
+
+        return False
 
 def error_scr(message):
     run = True
@@ -102,7 +103,7 @@ def error_scr(message):
                     run = False
 
 def start():
-    click = False
+    clicked = False
     while True:
         screen.fill(bg)
         key = pygame.key.get_pressed()
@@ -110,33 +111,27 @@ def start():
         write("Altitude Adventures", font1, (255, 255, 255), screen, 501, 100)
 
         mx, my = pygame.mouse.get_pos()
-
-        button1 = pygame.Rect(615, 300, 300, 75)
-        button2 = pygame.Rect(615, 430, 300, 75)
-        button3 = pygame.Rect(615, 560, 300, 75)
-        if button1.collidepoint((mx, my)):
-            if click:
+        loginbtn = Button(615, 300, "Login")
+        regbtn = Button(615, 430, "Register")
+        exitbtn = Button(615, 560, "Quit")
+        if loginbtn.click((mx, my)):
+            if clicked:
                 login()
-        if button2.collidepoint((mx, my)):
-            if click:
+        if regbtn.click((mx, my)):
+            if clicked:
                 register()
-        if button3.collidepoint((mx, my)):
-            if click:
+        if exitbtn.click((mx, my)):
+            if clicked:
                 pygame.quit()
-        pygame.draw.rect(screen, (33, 40, 45), button1)
-        pygame.draw.rect(screen, (33, 40, 45), button2)
-        pygame.draw.rect(screen, (33, 40, 45), button3)
-        click = False
-        write("Login", font1, (255, 255, 255), screen, 615, 300)
-        write("Register", font1, (255, 255, 255), screen, 615, 430)
-        write("Quit", font1, (255, 255, 255), screen, 615, 560)
+
+        clicked = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    click = True
+                    clicked = True
         if key[pygame.K_k] == True:
             menu()
         if key[pygame.K_l] == True:
@@ -146,7 +141,7 @@ def start():
 
 def register():
     running = True
-    click = False
+    clicked = False
 
     email_entry = pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((115, 200), (1350, 75)), manager=manager)
     username_entry = pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((115, 300), (1350, 75)), manager=manager)
@@ -165,13 +160,8 @@ def register():
 
         mx, my = pygame.mouse.get_pos()
 
-        button_register = pygame.Rect(120, 600, 300, 75)
-        pygame.draw.rect(screen, (33, 40, 45), button_register)
-        write("Register", font2, (255, 255, 255), screen, 210, 620)
-
-        button_back = pygame.Rect(1160, 600, 300, 75)
-        pygame.draw.rect(screen, (33, 40, 45), button_back)
-        write("Back", font2, (255, 255, 255), screen, 1280, 620)
+        button_register = Button(120, 600, "Register")
+        button_back = Button(1160, 600, "Back")
 
         refresh = clock.tick(60) / 1000
         manager.update(refresh)
@@ -184,38 +174,40 @@ def register():
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    click = True
+                    clicked = True
 
-        if button_register.collidepoint((mx, my)) and click:
-            email_text = email_entry.get_text().strip()
-            username_text = username_entry.get_text().strip()
-            password_text = passw_entry.get_text().strip()
-            confirm_password_text = conpassw_entry.get_text().strip()
-            if len(username_text) < 3:
-                error_scr("Username needs 3 characters minimum")
-            elif password_text != confirm_password_text:
-                error_scr("Passwords do not match")
+        if button_register.click((mx, my)):
+            if clicked:
+                email_text = email_entry.get_text().strip()
+                username_text = username_entry.get_text().strip()
+                password_text = passw_entry.get_text().strip()
+                confirm_password_text = conpassw_entry.get_text().strip()
+                if len(username_text) < 3:
+                    error_scr("Username needs 3 characters minimum")
+                elif password_text != confirm_password_text:
+                    error_scr("Passwords do not match")
 
-            elif len(password_text) < 8:
-                error_scr("Passwords needs to be 8 characters long")
-            else:
-                cursor.execute("INSERT INTO USERS (email, username, password) VALUES (?, ?, ?)",
-                            (email_text, username_text, password_text))
-                connection.commit()
+                elif len(password_text) < 8:
+                    error_scr("Passwords needs to be 8 characters long")
+                else:
+                    cursor.execute("INSERT INTO USERS (email, username, password) VALUES (?, ?, ?)",
+                                (email_text, username_text, password_text))
+                    connection.commit()
+                    running = False
+                    menu()
+
+        if button_back.click((mx, my)):
+            if clicked:
                 running = False
-                menu()
 
-        if button_back.collidepoint((mx, my)) and click:
-            running = False
-
-        click = False
+        clicked = False
         pygame.display.update()
 
 def login():
     for element in manager.get_root_container().elements[:]:
         element.kill()
     running = True
-    click = False
+    clicked = False
     username_entry_login = pygame_gui.elements.UITextEntryLine(
         relative_rect=pygame.Rect((115, 300), (1350, 75)), manager=manager, object_id="#user"
     )
@@ -234,18 +226,9 @@ def login():
         write("Password:", font2, (255, 255, 255), screen, 120, 405)
 
         mx, my = pygame.mouse.get_pos()
-
-        button_login = pygame.Rect(120, 500, 300, 75)
-        pygame.draw.rect(screen, (33, 40, 45), button_login)
-        write("Login", font2, (255, 255, 255), screen, 210, 520)
-
-        button_back = pygame.Rect(1160, 500, 300, 75)
-        pygame.draw.rect(screen, (33, 40, 45), button_back)
-        write("Back", font2, (255, 255, 255), screen, 1280, 520)
-
-        button_forgot = pygame.Rect(640, 500, 300, 75)
-        pygame.draw.rect(screen, (33, 40, 45), button_forgot)
-        write("Forgot Password", font2, (255, 255, 255), screen, 705, 520)
+        button_login = Button(120, 500, "Login")
+        button_back = Button(1160, 300, "Back")
+        button_forgot = Button(640, 500, "Forgot Password")
 
         refresh = clock.tick(60) / 1000
         manager.update(refresh)
@@ -262,30 +245,33 @@ def login():
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    click = True
+                    clicked = True
 
-        if button_login.collidepoint((mx, my)) and click:
-            username_text = username_entry_login.get_text().strip()
-            password_text = password_entry_login.get_text().strip()
-            cursor.execute("SELECT password FROM USERS WHERE username = ?", (username_text,))
-            result = cursor.fetchone()
-            if result:
-                stored_password = result[0]
-                if stored_password == password_text:
-                    menu()
+        if button_login.click((mx, my)):
+            if clicked:
+                username_text = username_entry_login.get_text().strip()
+                password_text = password_entry_login.get_text().strip()
+                cursor.execute("SELECT password FROM USERS WHERE username = ?", (username_text,))
+                result = cursor.fetchone()
+                if result:
+                    stored_password = result[0]
+                    if stored_password == password_text:
+                        menu()
+                    else:
+                        error_scr("Invalid password")
                 else:
-                    error_scr("Invalid password")
-            else:
-                error_scr("User not found")
-        if button_back.collidepoint((mx, my)) and click:
-            running = False
-            return
-        if button_forgot.collidepoint((mx,my)) and click:
-            for element in manager.get_root_container().elements[:]:
-                element.kill()
-            forgot_password()
+                    error_scr("User not found")
+        if button_back.click((mx, my)):
+            if clicked:
+                running = False
+                return
+        if button_forgot.click((mx,my)):
+            if clicked:
+                for element in manager.get_root_container().elements[:]:
+                    element.kill()
+                forgot_password()
 
-        click = False
+        clicked = False
         pygame.display.update()
 
 def forgot_password():
@@ -293,7 +279,7 @@ def forgot_password():
         element.kill()
 
     running = True
-    click = False
+    clicked = False
 
     email = pygame_gui.elements.UITextEntryLine(
         relative_rect=pygame.Rect((115, 300), (1350, 75)), manager=manager, object_id="#email"
@@ -309,23 +295,15 @@ def forgot_password():
         screen.fill(bg)
         manager.draw_ui(screen)
 
-        # Display Text Labels
         write("Forgot Password", font1, (255, 255, 255), screen, 600, 100)
         write("Email:", font2, (255, 255, 255), screen, 120, 305)
         write("Username:", font2, (255, 255, 255), screen, 120, 405)
         write("New password:", font2, (255, 255, 255), screen, 120, 505)
 
-        # Buttons
         mx, my = pygame.mouse.get_pos()
-        button_reset = pygame.Rect(120, 600, 300, 75)
-        pygame.draw.rect(screen, (33, 40, 45), button_reset)
-        write("Reset", font2, (255, 255, 255), screen, 210, 620)
+        button_reset = Button(120, 600, "Reset")
+        button_back = Button(1160, 600, "Back")
 
-        button_back = pygame.Rect(1160, 600, 300, 75)
-        pygame.draw.rect(screen, (33, 40, 45), button_back)
-        write("Back", font2, (255, 255, 255), screen, 1280, 620)
-
-        # Update UI
         refresh = clock.tick(60) / 1000
         manager.update(refresh)
 
@@ -339,34 +317,34 @@ def forgot_password():
                 running = False
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                click = True
+                clicked = True
 
-        if button_reset.collidepoint((mx, my)) and click:
-            email_text = email.get_text().strip()
-            username_text = username.get_text().strip()
-            new_pass_text = new_pass.get_text().strip()
+        if button_reset.click((mx, my)):
+            if clicked:
+                email_text = email.get_text().strip()
+                username_text = username.get_text().strip()
+                new_pass_text = new_pass.get_text().strip()
 
-            # Fetch user data
-            cursor.execute("SELECT email, username FROM USERS WHERE username = ?", (username_text,))
-            result = cursor.fetchone()
+                cursor.execute("SELECT email, username FROM USERS WHERE username = ?", (username_text,))
+                result = cursor.fetchone()
 
-            if result:
-                stored_email, stored_username = result
-                if stored_email == email_text and stored_username == username_text:
-                    # Update Password
-                    cursor.execute("UPDATE USERS SET password = ? WHERE username = ?", (new_pass_text, username_text))
-                    connection.commit()
-                    error_scr("Password Reset Successfully")
-                    start()
+                if result:
+                    stored_email, stored_username = result
+                    if stored_email == email_text and stored_username == username_text:
+                        cursor.execute("UPDATE USERS SET password = ? WHERE username = ?", (new_pass_text, username_text))
+                        connection.commit()
+                        error_scr("Password Reset Successfully")
+                        start()
+                    else:
+                        error_scr("Invalid Email or Username")
                 else:
-                    error_scr("Invalid Email or Username")
-            else:
-                error_scr("User not found")
+                    error_scr("User not found")
 
-        if button_back.collidepoint((mx, my)) and click:
-            running = False
+        if button_back.click((mx, my)):
+            if clicked:
+                running = False
 
-        click = False
+        clicked = False
         pygame.display.update()
 
 def menu():

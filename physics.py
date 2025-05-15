@@ -3,6 +3,7 @@ from enum import pickle_by_enum_name
 import pygame
 import config
 from maps import tilemap1_0
+import time
 
 grass_img = pygame.image.load("images/grass.png")
 dirt_img = pygame.image.load("images/dirt.png")
@@ -83,6 +84,7 @@ class Player:
         self.height = self.image.get_height()
         self.y_vel = 0
         self.jumped = False
+        self. health = 3
 
     def update(self, screen, game_over):
         self.screen = screen
@@ -94,7 +96,7 @@ class Player:
 
             if key[pygame.K_w] and self.jumped == False or  key[pygame.K_SPACE] and self.jumped == False:
                 self.y_vel = -10
-                self.jumped = False
+                self.jumped = True
             else:
                 self.jumped = False
 
@@ -123,11 +125,14 @@ class Player:
                         self.y_vel = 0
 
 
-
             if pygame.sprite.spritecollide(self, en_group, False):
-                game_over = True
+                player.health = player.health - 1
+                print(player.health)
 
             if pygame.sprite.spritecollide(self, spike_group, False):
+                game_over = True
+
+            if player.health <= 0 :
                 game_over = True
 
 
