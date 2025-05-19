@@ -1,4 +1,5 @@
 import pygame
+
 import config
 import maps
 
@@ -7,6 +8,8 @@ dirt_img = pygame.image.load("images/dirt.png")
 stone_img = pygame.image.load("images/stone.png")
 sky_img = pygame.image.load("images/sky.png")
 exit_img = pygame.image.load("images/exit.png")
+ice_left_img = pygame.image.load("images/ice_left3.png")
+ice_right_img = pygame.image.load("images/ice_right.png")
 
 heart_img = pygame.image.load("images/heart.png")
 heart_img = pygame.transform.scale(heart_img, (40, 40))
@@ -44,6 +47,38 @@ class World:
                     tile = (img, img_rect)
                     self.tile_list.append(tile)
 
+                elif tile == "g":
+                    img = pygame.transform.scale(grass_img, (tile_size, tile_size))
+                    img_rect = img.get_rect()
+                    img_rect.x = collumn_count * tile_size
+                    img_rect.y = row_count * tile_size
+                    tile = (img, img_rect)
+                    self.tile_list.append(tile)
+
+                elif tile == "d":
+                    img = pygame.transform.scale(dirt_img, (tile_size, tile_size))
+                    img_rect = img.get_rect()
+                    img_rect.x = collumn_count * tile_size
+                    img_rect.y = row_count * tile_size
+                    tile = (img, img_rect)
+                    self.tile_list.append(tile)
+
+                elif tile == "1":
+                    img = pygame.transform.scale(ice_left_img, (10, tile_size))
+                    img_rect = img.get_rect()
+                    img_rect.x = collumn_count * tile_size
+                    img_rect.y = row_count * tile_size
+                    tile = (img, img_rect)
+                    self.tile_list.append(tile)
+
+                elif tile == "2":
+                    img = pygame.transform.scale(ice_right_img, (20, tile_size))
+                    img_rect = img.get_rect()
+                    img_rect.x = collumn_count * tile_size
+                    img_rect.y = row_count * tile_size
+                    tile = (img, img_rect)
+                    self.tile_list.append(tile)
+
                 elif tile == "^":
                     spike = Spikes(collumn_count * tile_size, row_count * tile_size)
                     spike_group.add(spike)
@@ -51,7 +86,6 @@ class World:
                 elif tile == "o":
                     en = Enemy(collumn_count * tile_size, row_count * tile_size +30)
                     en_group.add(en)
-                    en.draw_outline(screen)
 
                 elif tile == "0":
                     coin = Coins(collumn_count * tile_size + 25, row_count * tile_size)
@@ -183,9 +217,6 @@ class Enemy (pygame.sprite.Sprite):
         self.rect.y = y
         self.direction = 1
         self.move = 0
-
-    def draw_outline(self, surface):
-        pygame.draw.rect(surface, (0,255,0), self.rect, 100)
 
     def update(self):
         self.rect.x = self.rect.x + self.direction
