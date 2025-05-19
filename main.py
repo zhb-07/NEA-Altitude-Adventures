@@ -3,6 +3,8 @@ import pygame
 import pygame_gui
 import sqlite3
 import config
+import physics
+import maps
 
 #game variables
 screen = config.screen
@@ -72,7 +74,7 @@ class Button:
         self.text = text
         self.button = pygame.Rect(x, y, 300, 75)
         pygame.draw.rect(screen, (33, 40, 45), self.button)
-        write(self.text, font1, (255, 255, 255), screen, (self.x + 10), (self.y + 10))
+        write(self.text, font3, (255, 255, 255), screen, (self.x + 10), (self.y + 10))
 
     def click (self, pos):
         if self.x < pos[0] < self.x + 300:
@@ -227,7 +229,7 @@ def login():
 
         mx, my = pygame.mouse.get_pos()
         button_login = Button(120, 500, "Login")
-        button_back = Button(1160, 300, "Back")
+        button_back = Button(1160, 500, "Back")
         button_forgot = Button(640, 500, "Forgot Password")
 
         refresh = clock.tick(60) / 1000
@@ -348,46 +350,37 @@ def forgot_password():
         pygame.display.update()
 
 def menu():
-    click = False
+    clicked = False
     while True:
         screen.fill(bg)
         pygame.display.set_caption("Altitude Adventures")
         write("Main Menu", font1, (255, 255, 255), screen, 630, 100)
 
         mx, my = pygame.mouse.get_pos()
-
-        button1 = pygame.Rect(615, 300, 300, 75)
-        button2 = pygame.Rect(615, 430, 300, 75)
-        button3 = pygame.Rect(615, 560, 300, 75)
-        button4 = pygame.Rect(615, 690, 300, 75)
-        if button1.collidepoint((mx, my)):
-            if click:
+        playbtn = Button (615, 300, "Play")
+        leaderboardbtn = Button(615, 430, "Leaderboard")
+        optionsbtn = Button(615, 560, "Options")
+        quitbtn=Button(616, 690, "Quit")
+        if playbtn.click((mx, my)):
+            if clicked:
                 lselect()
-        if button2.collidepoint((mx, my)):
-            if click:
+        if leaderboardbtn.click((mx, my)):
+            if clicked:
                 leaderboard()
-        if button3.collidepoint((mx, my)):
-            if click:
+        if optionsbtn.click((mx, my)):
+            if clicked:
                 opt()
-        if button4.collidepoint((mx, my)):
-            if click:
+        if quitbtn.click((mx, my)):
+            if clicked:
                 pygame.quit()
-        pygame.draw.rect(screen, (33, 40, 45), button1)
-        pygame.draw.rect(screen, (33, 40, 45), button2)
-        pygame.draw.rect(screen, (33, 40, 45), button3)
-        pygame.draw.rect(screen, (33, 40, 45), button4)
-        click = False
-        write("Play", font1, (255, 255, 255), screen, 615, 300)
-        write("Leaderboard", font3, (255, 255, 255), screen, 615, 430)
-        write("Options", font1, (255, 255, 255), screen, 615, 560)
-        write("Quit", font1, (255, 255, 255), screen, 615, 690)
+        clicked = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    click = True
+                    clicked = True
 
         pygame.display.update()
 
@@ -569,9 +562,9 @@ def game_opt():
 
 def lvl1(lvl):
 
-    from physics import World,Player,game_over,en_group,spike_group,coin_group
-    from maps import tilemap1_0
-    world = World(tilemap1_0, screen)
+    from physics import Player, game_over, en_group, spike_group, coin_group
+
+    world = physics.World(maps.tilemap1, screen)
     player = Player(100, screen_height - 130, screen)
     start_ticks = pygame.time.get_ticks()
     score = 0
@@ -609,6 +602,7 @@ def lvl1(lvl):
         screen.blit(timer_text, (20, 20))
         score_text = font2.render(f"Score: {score}", True, (255, 255, 255))
         screen.blit(score_text, (20, 40))
+        player.draw_health(screen)
         pygame.display.update()
 
     pygame.quit()
