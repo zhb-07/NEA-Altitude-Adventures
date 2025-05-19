@@ -45,7 +45,7 @@ font3 = pygame.font.SysFont(None, 50)
 lvl = 1
 
 #player images for char_select
-player1 = pygame.image.load("images/player.png")
+player1 = pygame.image.load("images/player_front1.png")
 player1 = pygame.transform.scale(player1, (500,500))
 player1.set_colorkey((255, 255, 255))
 

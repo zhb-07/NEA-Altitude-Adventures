@@ -8,8 +8,8 @@ stone_img = pygame.image.load("images/stone.png")
 sky_img = pygame.image.load("images/sky.png")
 exit_img = pygame.image.load("images/exit.png")
 
-heart_img = pygame.image.load("images/health.png")
-heart_img = pygame.transform.scale(heart_img, (30, 30))
+heart_img = pygame.image.load("images/heart.png")
+heart_img = pygame.transform.scale(heart_img, (40, 40))
 
 screen = config.screen
 screen_width = config.screen_width
@@ -49,8 +49,9 @@ class World:
                     spike_group.add(spike)
 
                 elif tile == "o":
-                    en = Enemy(collumn_count * tile_size, row_count * tile_size +27)
+                    en = Enemy(collumn_count * tile_size, row_count * tile_size +30)
                     en_group.add(en)
+                    en.draw_outline(screen)
 
                 elif tile == "0":
                     coin = Coins(collumn_count * tile_size + 25, row_count * tile_size)
@@ -75,8 +76,10 @@ class Player:
     def __init__(self, x, y, screen):
         self.screen = screen
         self.screen_height = screen_height
-        self.image = pygame.transform.scale(player_image, (40,80))
+        self.image = pygame.transform.scale(player_image, (40,60    ))
         self.rect = self.image.get_rect()
+        self.x = x
+        self.y = y
         self.rect.x = x
         self.rect.y = y
         self.width = self.image.get_width()
@@ -141,8 +144,8 @@ class Player:
         return game_over
 
     def reset_position(self):
-        self.rect.x = 100
-        self.rect.y = 300
+        self.rect.x = self.x
+        self.rect.y = self.y
         self.y_vel = 0
         self.jumped = False
 
@@ -172,7 +175,7 @@ class Coins(pygame.sprite.Sprite):
 class Enemy (pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load("images/enemy.png")
+        self.image = pygame.image.load("images/enemy1.png")
         self.image.set_colorkey((255, 255, 255))
         self.image = pygame.transform.scale(self.image, (20, 20))
         self.rect = self.image.get_rect()
@@ -180,6 +183,9 @@ class Enemy (pygame.sprite.Sprite):
         self.rect.y = y
         self.direction = 1
         self.move = 0
+
+    def draw_outline(self, surface):
+        pygame.draw.rect(surface, (0,255,0), self.rect, 100)
 
     def update(self):
         self.rect.x = self.rect.x + self.direction
