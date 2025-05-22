@@ -1,5 +1,4 @@
 import pygame
-
 import config
 import maps
 
@@ -12,7 +11,7 @@ ice_left_img = pygame.image.load("images/ice_left3.png")
 ice_right_img = pygame.image.load("images/ice_right.png")
 
 heart_img = pygame.image.load("images/heart.png")
-heart_img = pygame.transform.scale(heart_img, (40, 40))
+heart_img = pygame.transform.scale(heart_img, (30, 30))
 
 screen = config.screen
 screen_width = config.screen_width
@@ -110,7 +109,7 @@ class Player:
     def __init__(self, x, y, screen):
         self.screen = screen
         self.screen_height = screen_height
-        self.image = pygame.transform.scale(player_image, (40,60    ))
+        self.image = pygame.transform.scale(player_image, (40,60))
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y

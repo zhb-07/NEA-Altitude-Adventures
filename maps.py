@@ -20,8 +20,8 @@ tilemap1 = [
     "1........................gg..2",
     "1............................2",
     "1.........................0.g2",
-    "1.......ggg.g.g.ggggggggggggg2",
-    "1.....ggddd^d^d^ddddddddddddd2",
+    "1.......ggg.g.g.g.g.g.g.ggggg2",
+    "1.....ggddd^d^d^d^d^d^d^ddddd2",
     "1....gddddddddddddddddddddddd2",
     "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx2",
 ]

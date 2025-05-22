@@ -5,6 +5,7 @@ import sqlite3
 import config
 import physics
 import maps
+from physics import player
 
 #game variables
 screen = config.screen
@@ -46,18 +47,16 @@ lvl = 1
 
 #player images for char_select
 player1 = pygame.image.load("images/player_front1.png")
-player1 = pygame.transform.scale(player1, (500,500))
+player1 = pygame.transform.scale(player1, (400,400))
 player1.set_colorkey((255, 255, 255))
 
 player2 = pygame.image.load("images/player2.png")
-player2 = pygame.transform.scale(player2, (500,500))
+player2 = pygame.transform.scale(player2, (400,400))
 player2.set_colorkey((255, 255, 255))
 
 player3 = pygame.image.load("images/player3.png")
-player3 = pygame.transform.scale(player3, (500,500))
+player3 = pygame.transform.scale(player3, (400,400))
 player3.set_colorkey((255, 255, 255))
-
-playerimg = None
 
 #wrie function (like screen.blit)
 def write(text, font, colour, surface, x, y):
@@ -616,67 +615,53 @@ def lvl3(lvl):
 
 def char_select():
     running = True
-    click = False
-    show = player1
-    playerimg = None
+    show = player1  # default preview image
+    selected_img = player1  # default selection
+
     while running:
         key = pygame.key.get_pressed()
-        screen.fill((bg))
+        screen.fill(bg)
         mx, my = pygame.mouse.get_pos()
         pygame.display.set_caption("Altitude Adventures")
-        write("Character Select", font1, (255, 255, 255), screen, 600, 100)
+        write("Character Select", font1, (255, 255, 255), screen, 600, 50)
 
-        secondbtn = pygame.Rect(615, 690, 300, 75)
-        thirdbtn = pygame.Rect(930, 690, 300, 75)
-        firstbtn = pygame.Rect(300, 690, 300, 75)
-        backbtn = pygame.Rect(50, 50, 300, 75)
+        first_img_button = Button(300, 690, "Bob")
+        second_img_button = Button(615, 690, "Bria")
+        third_img_button = Button(930, 690, "Oliver")
+        back_button = Button(50, 50, "Back ")
 
-        if secondbtn.collidepoint((mx, my)):
-            if click:
-                show = player2
-                config.playerimg = player2
+        screen.blit(show, ((screen_width - 400) // 2, (screen_height - 400) // 2))
 
-        if thirdbtn.collidepoint((mx, my)):
-            if click:
-                show = player3
-                config.playerimg = player3
-
-        if firstbtn.collidepoint((mx, my)):
-            if click:
-                show = player1
-                config.playerimg = player1
-    
-        if backbtn.collidepoint((mx, my)):
-            if click:
-                running = False
-
-        pygame.draw.rect(screen, (33, 40, 45), secondbtn)
-        pygame.draw.rect(screen, (33, 40, 45), thirdbtn)
-        pygame.draw.rect(screen, (33, 40, 45), firstbtn)
-        pygame.draw.rect(screen, (33, 40, 45), backbtn)
-
-        write("One", font2, (255, 255, 255), screen,310 ,720)
-        write("Two", font2, (255, 255, 255), screen,630 ,720)
-        write("Three", font2, (255, 255, 255), screen,950 ,720)
-        write("Back", font2, (255, 255, 255), screen, 70, 70)
-
-        screen.blit(show, (500, 120))
-
+        clicked = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                return
+                return None
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    click = True
-            else:
-                click = False
+                    clicked = True
+            if key[pygame.K_ESCAPE]:
+                running = False
 
-            if key[pygame.K_ESCAPE] == True:
-                return
+        if first_img_button.click((mx, my)) and clicked:
+            show = player1
+            selected_img = player1
+
+        if second_img_button.click((mx, my)) and clicked:
+            show = player2
+            selected_img = player2
+
+        if third_img_button.click((mx, my)) and clicked:
+            show = player3
+            selected_img = player3
+
+        if back_button.click((mx, my)) and clicked:
+            running = False
+            return selected_img
 
         pygame.display.update()
 
-        return playerimg
+    config.playerimg = selected_img
+
 
 start()
